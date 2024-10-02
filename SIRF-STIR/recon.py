@@ -2,6 +2,7 @@ import os
 import sys
 from typing import Tuple, Any
 from pathlib import Path
+from datetime import datetime
 
 import numpy as np
 import nibabel as nib
@@ -9,6 +10,10 @@ from nibabel.processing import smooth_image
 from sirf.STIR import *
 
 from utils import get_intervals, get_file_with_suffix, ReconMetadata
+
+output_path = Path(
+    f"./output/{datetime.now().strftime('%Y-%m-%d-%H-%M')}_{os.getenv('GIT_COMMIT_SHORT_SHA')}"
+)
 
 meta = ReconMetadata(os.getenv("GIT_COMMIT_SHORT_SHA"))
 meta.start()
@@ -280,7 +285,7 @@ for current_frame_idx, (interval_start, interval_end) in enumerate(intervals, 1)
     meta.end_frame()
 
 meta.end()
-meta.save(Path("./output/"))
+meta.save(output_path)
 print(f"Processing took {meta.total_duration}")
 
 # Move time axis to where nifty expects it
@@ -290,7 +295,5 @@ result = np.swapaxes(result, 0, 2)
 result = np.flip(result, (0, 1, 2))
 
 result_image = nib.Nifti1Image(result, affine=np.eye(4))
-result_image_smoothed = smooth_image(result_image, 4)
 
-nib.save(result_image, "./output/result.nii")
-nib.save(result_image_smoothed, "./output/result_smoothed.nii")
+nib.save(result_image, output_path / "result.nii")
