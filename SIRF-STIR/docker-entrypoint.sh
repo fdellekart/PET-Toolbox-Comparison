@@ -53,7 +53,7 @@ if [ "$1" = 'recon' ]; then
     check_stir_files_exist
     verifyInputs
     extractOnDemand
-    nm_mrac2mu -i ./input/pseudoCT -o ./output/human_mumap.nii || true  # Fails in the end but file is still output
+    nm_mrac2mu -i ./input/MRAC -o ./output/human_mumap.nii || true  # Fails in the end but file is still output
     python merge_umaps.py ./input/hardware_umap.nii ./output/human_mumap.nii ./output/combined_mumap.nii
     python recon.py $2 $3 $4
 else if [ "$1" = 'sleep' ]; then
