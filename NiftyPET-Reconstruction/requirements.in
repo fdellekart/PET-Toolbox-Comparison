@@ -1,0 +1,8 @@
+niftypet
+brainweb
+miutil
+scipy<1.14.0
+tqdm
+matplotlib
+numpy<2
+pydicom

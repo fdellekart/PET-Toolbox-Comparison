@@ -1,0 +1,15 @@
+services:
+  niftypet:
+    build:
+      context: .
+    command: recon 200 3180 30
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ${PWD}/input:/var/work/input
+      - ${PWD}/output:/var/work/output
