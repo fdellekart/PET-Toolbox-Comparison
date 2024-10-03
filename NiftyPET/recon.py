@@ -1,20 +1,16 @@
 from __future__ import print_function, division
-from os import path, getenv, listdir, mkdir
+from os import path, listdir
 import logging
 import sys
 import shutil
 from pathlib import Path
-from datetime import datetime
 
 from niftypet import nipet
 from niftypet import timer as meta
 import numpy as np
 
 
-output_path = Path(
-    f"./output/{datetime.now().strftime('%Y-%m-%d-%H-%M')}_{getenv('GIT_COMMIT_SHORT_SHA')}"
-)
-mkdir(output_path)
+output_path = Path(f"./output/")
 
 TIME_START, TIME_END, TIME_STEP = map(int, sys.argv[1:])
 meta.add_metadatum("time_start", TIME_START)

@@ -2,18 +2,14 @@ import os
 import sys
 from typing import Tuple, Any
 from pathlib import Path
-from datetime import datetime
 
 import numpy as np
 import nibabel as nib
-from nibabel.processing import smooth_image
 from sirf.STIR import *
 
 from utils import get_intervals, get_file_with_suffix, ReconMetadata
 
-output_path = Path(
-    f"./output/{datetime.now().strftime('%Y-%m-%d-%H-%M')}_{os.getenv('GIT_COMMIT_SHORT_SHA')}"
-)
+output_path = Path(f"./output/")
 
 meta = ReconMetadata(os.getenv("GIT_COMMIT_SHORT_SHA"))
 meta.start()
@@ -296,4 +292,4 @@ result = np.flip(result, (0, 1, 2))
 
 result_image = nib.Nifti1Image(result, affine=np.eye(4))
 
-nib.save(result_image, output_path / "result.nii")
+nib.save(result_image, output_path / "result.nii.gz")

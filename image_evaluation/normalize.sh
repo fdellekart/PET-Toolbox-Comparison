@@ -3,7 +3,7 @@
 normalize_frame(){
     idx=$1;
     echo "Normalizing frame with idx $idx..."
-    
+
     # Extract the frame_idx-th frame
     fslroi pet_mc pet_mc_frame_${idx} $idx 1
     flirt -in pet_mc_frame_${idx} -ref $T1_IMAGE -applyxfm -init pet2t1.mat -out pet_coreg_frame_${idx}
@@ -15,7 +15,7 @@ normalize_frame(){
 N_PROCS=32
 
 # Set up paths
-PET_IMAGE="data/sub-00/pet/result_span11.nii"  # Path to the 4D dynamic PET image
+PET_IMAGE="data/sub-00/pet/result.nii.gz"  # Path to the 4D dynamic PET image
 T1_IMAGE="data/sub-00/anat/sub-00_T1w.nii"        # Path to the T1-weighted anatomical MRI image
 MNI_TEMPLATE="/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm.nii.gz"  # Path to MNI template (2mm resolution)
 MNI_BRAIN_MASK="/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm_brain_mask.nii.gz"
@@ -37,7 +37,7 @@ echo "Normalizing each PET frame to MNI space with ${N_PROCS} in parallel..."
 
 # WARNING: this is fairly hungry for RAM
 # Turn down N-procs in case it's a problem
-( 
+(
 for (( frame_idx=0; frame_idx<n_frames; frame_idx++ )); do
     ((i=i%N_PROCS)); ((i++==0)) && wait
     normalize_frame "$frame_idx" &

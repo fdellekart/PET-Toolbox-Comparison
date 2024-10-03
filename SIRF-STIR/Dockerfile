@@ -8,6 +8,9 @@
 FROM ghcr.io/synerbi/sirf:latest
 
 USER root
+ARG GIT_COMMIT_SHORT_SHA
+ENV GIT_COMMIT_SHORT_SHA=$GIT_COMMIT_SHORT_SHA
+
 WORKDIR /home/jovyan
 RUN fix-permissions "${CONDA_DIR}" /home/${NB_USER}
 RUN apt install -y cmake git libgoogle-glog-dev libinsighttoolkit5-dev libboost-all-dev
@@ -38,8 +41,5 @@ ENV PATH="$PATH:/opt/SIRF-SuperBuild/INSTALL/bin:/home/jovyan/.local/bin"
 
 RUN chown -c jovyan .
 USER jovyan
-
-ARG GIT_COMMIT_SHORT_SHA
-ENV GIT_COMMIT_SHORT_SHA=$GIT_COMMIT_SHORT_SHA
 
 ENTRYPOINT [ "/home/jovyan/work/recon/docker-entrypoint.sh" ]
