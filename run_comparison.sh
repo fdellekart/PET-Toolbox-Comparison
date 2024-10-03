@@ -15,7 +15,8 @@ for target in ${TARGET_DIRS[@]}; do
 
     cd $target
     exec ./run_recon.sh
-    cp ./output/${OUTPUT_VERSION_DIR}/result.nii.gz ${DESTINATION_DIR}/result.nii.gz
+    cp ./output/result.nii.gz ${DESTINATION_DIR}/result.nii.gz
+    cp ./output/metadata.json ${DESTINATION_DIR}/metadata.json
 
     cd ../image_evaluation
     cp ${DESTINATION_DIR}/result.nii.gz ./data/sub-00/pet/result.nii.gz

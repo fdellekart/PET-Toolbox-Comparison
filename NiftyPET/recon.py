@@ -76,7 +76,10 @@ recon = nipet.mmrchain(
 meta.end()
 meta.save(output_path)
 nifty_file = next(
-    filter(lambda filename: filename.endswith(".nii.gz"), listdir("./input/niftyout/"))
+    filter(
+        lambda filename: filename.endswith(".nii.gz"),
+        listdir("./input/niftyout/PET/multiple_frames"),
+    )
 )
 shutil.copy(
     Path(folderin) / "niftyout" / "PET" / "multiple-frames" / nifty_file,
