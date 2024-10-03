@@ -1,0 +1,9 @@
+FROM vistalab/fsl-v5.0
+
+WORKDIR /work
+
+COPY docker-entrypoint-normalize.sh docker-entrypoint-normalize.sh
+COPY normalize.sh normalize.sh
+RUN chmod a+x docker-entrypoint-normalize.sh
+
+ENTRYPOINT [ "/work/docker-entrypoint-normalize.sh" ]

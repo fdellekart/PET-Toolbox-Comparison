@@ -1,0 +1,16 @@
+FROM python:3.12
+
+RUN mkdir /var/work
+WORKDIR /var/work
+
+RUN apt update && apt install build-essential
+
+COPY docker-entrypoint-analysis.sh docker-entrypoint-analysis.sh
+RUN chmod +x /var/work/docker-entrypoint-analysis.sh
+
+COPY requirements.txt requirements.txt
+RUN python -m pip install -r requirements.txt
+
+COPY analyze.py analyze.py
+
+ENTRYPOINT [ "/var/work/docker-entrypoint-analysis.sh" ]
