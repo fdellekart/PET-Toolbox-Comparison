@@ -119,13 +119,7 @@ class ReconMetadata:
 
     def end_frame(self) -> None:
         self.end_block("frame")
-
         self._previous_times.append(deepcopy(self._current_times))
-        print(
-            f"Finished frame nr {len(self._previous_times)}. "
-            f"Took {self._current_times['frame']['end'] - self._current_times['frame']['start']} seconds."
-        )
-
         self._current_times = defaultdict(dict)
 
     def add_metadatum(self, key: str, value: T) -> T:
