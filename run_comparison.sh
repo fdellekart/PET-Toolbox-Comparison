@@ -13,13 +13,14 @@ mkdir "${DESTINATION_PARENT_DIR}"
 
 # Function to capture stats and append them to CSV
 capture_stats() {
+    gpu_stats=$(nvidia-smi -i $GPU_DEVICE_ID --query-gpu memory.used,utilization.gpu --format=csv,noheader)
     docker stats --no-stream --format \
     "{{.CPUPerc}},{{.MemPerc}},{{.MemUsage}},{{.BlockIO}}" $CONTAINER_NAME | \
     while IFS= read -r line; do
         # Get current timestamp
         timestamp=$(date '+%Y-%m-%d %H:%M:%S')
         # Append to CSV with timestamp
-        echo "$timestamp,$line" >> $STAT_LOG_PATH
+        echo "$timestamp,$line,$gpu_stats" >> $STAT_LOG_PATH
     done
 }
 
@@ -30,7 +31,7 @@ for target in ${TARGET_DIRS[@]}; do
     echo "Stat log path: ${STAT_LOG_PATH}"
 
     mkdir "${DESTINATION_DIR}"
-    echo "Timestamp,CPU_Usage(%),Memory_Usage(%),Memory_Usage/Limit,Block_I/O" > $STAT_LOG_PATH
+    echo "Timestamp,CPU_Usage(%),Memory_Usage(%),Memory_Usage/Limit,Block_I/O,GPU_Memory,GPU_Utilization" > $STAT_LOG_PATH
 
     cd $target
 
