@@ -14,12 +14,14 @@ COPY requirements.txt requirements.txt
 RUN ["python", "-m", "venv", "reco-venv"]
 RUN ["reco-venv/bin/pip", "install", "--upgrade", "pip"]
 RUN ["reco-venv/bin/pip", "install", "-r", "requirements.txt"]
-RUN ["reco-venv/bin/pip", "install", "git+https://github.com/fdellekart/NIPET.git@measure-timing"]
 
 COPY utils.py uitls.py
 COPY recon.py recon.py
 
 COPY docker-entrypoint.sh docker-entrypoint.sh
 RUN ["chmod", "+x", "/var/work/docker-entrypoint.sh"]
+
+ARG CACHEBUST
+RUN ["reco-venv/bin/pip", "install", "git+https://github.com/fdellekart/NIPET.git@measure-timing"]
 
 ENTRYPOINT [ "/var/work/docker-entrypoint.sh" ]
