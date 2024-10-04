@@ -86,11 +86,15 @@ class MyFormatter(Formatter):
 
 
 def plot_frame(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
-    is_in_frame = (resource_data.index > frame_timings["frame"]["start"]) & (
-        resource_data.index < frame_timings["frame"]["end"]
+    # Extract frame and time everything in seconds relative to start
+    frame_start = frame_timings["frame"]["start"]
+    frame_end = frame_timings["frame"]["end"]
+    is_in_frame = (resource_data.index > frame_start) & (
+        resource_data.index < frame_end
     )
     resource_data = resource_data[is_in_frame]
-    resource_data.index = (resource_data.index - resource_data.index.min()).seconds
+    frame_timings = (frame_timings - frame_start).dt.seconds
+    resource_data.index = (resource_data.index - frame_start).seconds
 
     fig, ((cpu_ax, mem_ax), (gpu_util_ax, gpu_mem_ax)) = plt.subplots(2, 2)
 
@@ -114,11 +118,23 @@ def plot_frame(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
     gpu_util_ax.set_ylim(bottom=0)
     gpu_mem_ax.set_ylim(bottom=0)
 
-    cpu_ax.set_xticks(
-        np.arange(resource_data.index.min(), resource_data.index.max(), 60)
-    )
+    cpu_ax.set_xticks(np.arange(0, resource_data.index.max(), 60))
     cpu_ax.set_xticklabels(cpu_ax.get_xticklabels(), rotation=50)
 
+    for block_name in frame_timings.index.levels[0].drop("frame"):
+        block_start = frame_timings[block_name]["start"]
+        block_end = frame_timings[block_name]["end"]
+        if block_start == block_end:
+            continue
+
+        cpu_ax.axvspan(
+            frame_timings[block_name]["start"],
+            frame_timings[block_name]["end"],
+            alpha=0.3,
+            label=block_name,
+        )
+
+    plt.legend()
     plt.tight_layout()
     plt.show()
 
