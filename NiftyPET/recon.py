@@ -34,6 +34,7 @@ SIGMA2FWHMmm = (
 )
 
 folderin = "./input/"
+shutil.rmtree(Path(folderin) / "niftyout")
 folderout = "."  # realtive to `{folderin}/niftyout`
 itr = meta.add_metadatum(
     "num_subiterations", 7
@@ -78,7 +79,7 @@ meta.save(output_path)
 nifty_file = next(
     filter(
         lambda filename: filename.endswith(".nii.gz"),
-        listdir("./input/niftyout/PET/multiple_frames"),
+        listdir("./input/niftyout/PET/multiple-frames"),
     )
 )
 shutil.copy(
