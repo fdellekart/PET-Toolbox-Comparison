@@ -1,8 +1,7 @@
 import os
 import json
-import time
 from copy import deepcopy
-from datetime import timedelta
+from datetime import timedelta, datetime
 from typing import List, Tuple, Dict, TypeVar
 from math import floor, sqrt
 from pathlib import Path
@@ -56,25 +55,25 @@ class ReconMetadata:
 
     def start(self) -> None:
         """Set overall start to current time"""
-        self.start_time = time.time()
+        self.start_time = datetime.now()
 
     def end(self) -> None:
         """Set overall end to current time"""
-        self.end_time = time.time()
+        self.end_time = datetime.now()
 
     def start_block(self, block_name: str) -> None:
         """Set start time of a task within the reconstruction"""
-        self._current_times[block_name]["start"] = time.time()
+        self._current_times[block_name]["start"] = datetime.now().isoformat()
 
     def end_block(self, block_name: str) -> None:
         """Set end time of a task within the reconstruction"""
         if block_name not in self._current_times:
             raise RuntimeError(f"Block '{block_name}' was not started!")
-        self._current_times[block_name]["end"] = time.time()
+        self._current_times[block_name]["end"] = datetime.now().isoformat()
 
     @property
     def total_duration(self) -> timedelta:
-        return timedelta(seconds=self.end_time - self.start_time)
+        return self.end_time - self.start_time
 
     def _calc_durations(self) -> List[Dict[str, float]]:
         return [
