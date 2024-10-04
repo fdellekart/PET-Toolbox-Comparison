@@ -39,7 +39,6 @@ for target in ${TARGET_DIRS[@]}; do
     DESTINATION_DIR=${DESTINATION_PARENT_DIR}/${target}
     CONTAINER_NAME="$(echo "$target" | tr '[:upper:]' '[:lower:]')-recon"
     STAT_LOG_PATH=${DESTINATION_DIR}/resources.csv
-    echo "Stat log path: ${STAT_LOG_PATH}"
 
     mkdir "${DESTINATION_DIR}"
     echo "Timestamp,CPU_Usage(%),Memory_Usage(%),Memory_Usage/Limit,Block_I/O,GPU_Memory,GPU_Utilization" > $STAT_LOG_PATH
@@ -48,18 +47,22 @@ for target in ${TARGET_DIRS[@]}; do
 
     ./run_recon.sh /dev/null 2>&1 &
     task_pid=$!
+    echo "Logging resource information to ${STAT_LOG_PATH}"
     while kill -0 "$task_pid" 2>/dev/null; do
         capture_stats
         sleep 1
     done
     wait "$task_pid"
 
+    echo "Copying reconstruction results to ${DESTINATION_DIR}"
     cp ./output/result.nii.gz ${DESTINATION_DIR}/result.nii.gz
     cp ./output/metadata.json ${DESTINATION_DIR}/metadata.json
 
     cd ../image_evaluation
     cp ${DESTINATION_DIR}/result.nii.gz ./data/sub-00/pet/result.nii.gz
     ./run_eval.sh
+
+    echo "Copying normalized images and evaluation results to ${DESTINATION_DIR}"
     cp ./data/pet_mni4d.nii.gz ${DESTINATION_DIR}/pet_mni4d.nii.gz
     cp ./data/result.json ${DESTINATION_DIR}/evaluation.json
 
