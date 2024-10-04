@@ -3,13 +3,24 @@
 # This script runs the reconstruction and evaluation for all
 # specified targets and saves images and metadata to results
 
-TARGET_DIRS=(SIRF-STIR NiftyPET)
+TARGET_DIRS=(NiftyPET SIRF-STIR)
 GIT_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)
+GPU_DEVICE_ID=0
 
 printf -v date '%(%Y-%m-%d-%H-%M)T' -1
 export OUTPUT_VERSION_DIR=${date}-${GIT_COMMIT_SHORT_SHA}
 DESTINATION_PARENT_DIR=${PWD}/results/${OUTPUT_VERSION_DIR}
 mkdir "${DESTINATION_PARENT_DIR}"
+
+# Ensure everything is cleaned up in case the script is
+# terminated before finished.
+cleanup() {
+    docker stop $CONTAINER_NAME
+    docker stop image-normalization 2>/dev/null
+    docker stop image-analysis 2>/dev/null
+    exit 1
+}
+trap cleanup SIGINT
 
 # Function to capture stats and append them to CSV
 capture_stats() {
