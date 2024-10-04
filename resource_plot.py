@@ -2,6 +2,8 @@ import json
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import Formatter
 
 
 resource_file = "results/2024-10-04-13-46-b9d60b5/NiftyPET/resources.csv"
@@ -75,5 +77,52 @@ def parse_timings(metadata: dict) -> pd.DataFrame:
 with open(metadata_file) as f:
     metadata = json.load(f)
 
+
+class MyFormatter(Formatter):
+    def __call__(self, x, pos=0):
+        minutes = int(x // 60)
+        seconds = int(x % 60)
+        return f"{'0' if minutes < 10 else ''}{minutes}:{'0' if seconds < 10 else ''}{seconds}"
+
+
+def plot_frame(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
+    is_in_frame = (resource_data.index > frame_timings["frame"]["start"]) & (
+        resource_data.index < frame_timings["frame"]["end"]
+    )
+    resource_data = resource_data[is_in_frame]
+    resource_data.index = (resource_data.index - resource_data.index.min()).seconds
+
+    fig, ((cpu_ax, mem_ax), (gpu_util_ax, gpu_mem_ax)) = plt.subplots(2, 2)
+
+    cpu_ax.set_title("Number of used CPU cores")
+    mem_ax.set_title("RAM usage in GB")
+    gpu_util_ax.set_title("GPU utilization in %")
+    gpu_mem_ax.set_title("GPU memory usage in GB")
+
+    cpu_ax.plot(resource_data.index, resource_data["n_cpus"])
+    mem_ax.plot(resource_data.index, resource_data["memory"])
+    gpu_util_ax.plot(resource_data.index, resource_data["gpu_util"])
+    gpu_mem_ax.plot(resource_data.index, resource_data["gpu_memory"])
+
+    cpu_ax.xaxis.set_major_formatter(MyFormatter())
+    mem_ax.xaxis.set_major_formatter(MyFormatter())
+    gpu_util_ax.xaxis.set_major_formatter(MyFormatter())
+    gpu_mem_ax.xaxis.set_major_formatter(MyFormatter())
+
+    cpu_ax.set_ylim(bottom=0)
+    mem_ax.set_ylim(bottom=0)
+    gpu_util_ax.set_ylim(bottom=0)
+    gpu_mem_ax.set_ylim(bottom=0)
+
+    cpu_ax.set_xticks(
+        np.arange(resource_data.index.min(), resource_data.index.max(), 60)
+    )
+    cpu_ax.set_xticklabels(cpu_ax.get_xticklabels(), rotation=50)
+
+    plt.tight_layout()
+    plt.show()
+
+
 resource_data = parse_resources_file(resource_file)
 timings = parse_timings(metadata)
+plot_frame(resource_data, timings.loc[1, :])
