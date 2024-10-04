@@ -1,8 +1,11 @@
+import json
+
 import numpy as np
 import pandas as pd
 
 
-datafile = "./results/2024-10-04-12-01-961a40e/NiftyPET/resources.csv"
+resource_file = "results/2024-10-04-13-46-b9d60b5/NiftyPET/resources.csv"
+metadata_file = "results/2024-10-04-13-46-b9d60b5/NiftyPET/metadata.json"
 
 
 def parse_resources_file(datafile: str) -> pd.DataFrame:
@@ -48,5 +51,29 @@ def parse_resources_file(datafile: str) -> pd.DataFrame:
     return data
 
 
-data = parse_resources_file(datafile)
-print()
+def parse_timings(metadata: dict) -> pd.DataFrame:
+    """Extract the timing information from metadata into a dataframe.
+
+    :param metadata: Dict loaded from the metadata.json saved for a toolbox
+    :return: dataframe with one row per frame
+        columns are a multiindex with first level block name and second start/end times
+    """
+    timings = pd.DataFrame(
+        [
+            {
+                (block_name, inner_key): value
+                for block_name, inner_dict in frame.items()
+                for inner_key, value in inner_dict.items()
+            }
+            for frame in metadata["timings"]
+        ]
+    ).map(pd.to_datetime)
+    timings.columns = pd.MultiIndex.from_tuples(timings.columns)
+    return timings
+
+
+with open(metadata_file) as f:
+    metadata = json.load(f)
+
+resource_data = parse_resources_file(resource_file)
+timings = parse_timings(metadata)
