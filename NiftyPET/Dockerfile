@@ -1,7 +1,7 @@
 FROM nvidia/cuda:12.6.0-devel-ubuntu22.04
 
 ARG GIT_COMMIT_SHORT_SHA
-ENV GIT_COMMIT_SHORT_SHA=GIT_COMMIT_SHORT_SHA
+ENV GIT_COMMIT_SHORT_SHA=$GIT_COMMIT_SHORT_SHA
 
 RUN apt-get update && \
     apt-get install -y python3.10-venv python3.10-dev python-is-python3 build-essential cmake git && \
