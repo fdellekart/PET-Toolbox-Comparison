@@ -29,7 +29,7 @@ capture_stats() {
     "{{.CPUPerc}},{{.MemPerc}},{{.MemUsage}},{{.BlockIO}}" $CONTAINER_NAME | \
     while IFS= read -r line; do
         # Get current timestamp
-        timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+        timestamp=$(date --utc '+%Y-%m-%d %H:%M:%S')
         # Append to CSV with timestamp
         echo "$timestamp,$line,$gpu_stats" >> $STAT_LOG_PATH
     done
