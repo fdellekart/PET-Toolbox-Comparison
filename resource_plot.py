@@ -38,6 +38,8 @@ def parse_resources_file(datafile: str) -> pd.DataFrame:
     data["time"] = pd.to_datetime(data["time"])
     data.set_index("time", inplace=True)
     data["memory"] = data["memory"].str.split(" / ").str[0]
+    is_zero_b = data["memory"] == "0B"
+    data.loc[is_zero_b, "memory"] = "0GiB"
     is_gigabyte = data["memory"].str.endswith("GiB")
     is_megabyte = data["memory"].str.endswith("MiB")
     assert (is_gigabyte | is_megabyte).all()
