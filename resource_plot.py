@@ -146,21 +146,13 @@ def plot_gpu(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
     add_blocks_to_ax(gpu_util_ax, frame_timings)
     add_blocks_to_ax(gpu_mem_ax, frame_timings)
 
+    gpu_util_ax.legend()
+
     plt.tight_layout()
     plt.show()
 
 
 def plot_cpu_ram(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
-    # Extract frame and time everything in seconds relative to start
-    frame_start = frame_timings["frame"]["start"]
-    frame_end = frame_timings["frame"]["end"]
-    is_in_frame = (resource_data.index > frame_start) & (
-        resource_data.index < frame_end
-    )
-    resource_data = resource_data[is_in_frame]
-    frame_timings = (frame_timings - frame_start).dt.seconds
-    resource_data.index = (resource_data.index - frame_start).seconds
-
     fig, (cpu_ax, mem_ax) = plt.subplots(1, 2)
 
     cpu_ax.set_title("Number of used CPU cores")
@@ -190,9 +182,28 @@ def plot_cpu_ram(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
     plt.show()
 
 
-resource_data = parse_resources_file(resource_file)
-timings = parse_timings(metadata)
+def prepare_for_plot(
+    resource_data: pd.DataFrame, frame_timings: pd.Series
+) -> pd.DataFrame:
+    """Extract frame and time everything in seconds relative to start"""
+    frame_start = frame_timings["frame"]["start"]
+    frame_end = frame_timings["frame"]["end"]
+    is_in_frame = (resource_data.index > frame_start) & (
+        resource_data.index < frame_end
+    )
+    resource_data = resource_data[is_in_frame]
+    frame_timings = (frame_timings - frame_start).dt.seconds
+    resource_data.index = (resource_data.index - frame_start).seconds
 
-plot_cpu_ram(resource_data, timings.loc[1, :])
+    return resource_data, frame_timings
+
+
+timings = parse_timings(metadata)
+frame_timings = timings.loc[1, :]
+
+resource_data = parse_resources_file(resource_file)
+resource_data, frame_timings = prepare_for_plot(resource_data, frame_timings)
+
+plot_cpu_ram(resource_data, frame_timings)
 if TOOLBOX_SUPPORTS_GPU[TOOLBOX]:
-    plot_gpu(resource_data, timings.loc[1, :])
+    plot_gpu(resource_data, frame_timings)
