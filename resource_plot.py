@@ -1,14 +1,18 @@
 import json
 import re
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import Formatter
 
+TOOLBOX_SUPPORTS_GPU = {"SIRF-STIR": False, "NiftyPET": True}
+TOOLBOX = "NiftyPET"
+RUNDIR = Path("results/2024-10-04-16-24-afbd5f5")
 
-resource_file = "results/2024-10-04-16-24-afbd5f5/SIRF-STIR/resources.csv"
-metadata_file = "results/2024-10-04-16-24-afbd5f5/SIRF-STIR/metadata.json"
+resource_file = RUNDIR / TOOLBOX / "resources.csv"
+metadata_file = RUNDIR / TOOLBOX / "metadata.json"
 
 
 def parse_resources_file(datafile: str) -> pd.DataFrame:
@@ -88,7 +92,35 @@ class MyFormatter(Formatter):
         return f"{'0' if minutes < 10 else ''}{minutes}:{'0' if seconds < 10 else ''}{seconds}"
 
 
-def plot_frame(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
+def plot_gpu(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
+    fig, (gpu_util_ax, gpu_mem_ax) = plt.subplots(1, 2)
+
+    gpu_util_ax.set_title("GPU utilization in %")
+    gpu_mem_ax.set_title("GPU memory usage in GB")
+
+    gpu_util_ax.plot(resource_data.index, resource_data["gpu_util"])
+    gpu_mem_ax.plot(resource_data.index, resource_data["gpu_memory"])
+
+    gpu_util_ax.xaxis.set_major_formatter(MyFormatter())
+    gpu_mem_ax.xaxis.set_major_formatter(MyFormatter())
+
+    gpu_util_ax.set_ylim(bottom=0)
+    gpu_mem_ax.set_ylim(bottom=0)
+
+    gpu_util_ax.set_xticks(np.arange(0, resource_data.index.max(), 60))
+    gpu_util_ax.set_xticklabels(gpu_util_ax.get_xticklabels(), rotation=50)
+
+    gpu_mem_ax.set_xticks(np.arange(0, resource_data.index.max(), 60))
+    gpu_mem_ax.set_xticklabels(gpu_mem_ax.get_xticklabels(), rotation=50)
+
+    add_blocks_to_ax(gpu_util_ax, frame_timings)
+    add_blocks_to_ax(gpu_mem_ax, frame_timings)
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_cpu_ram(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
     # Extract frame and time everything in seconds relative to start
     frame_start = frame_timings["frame"]["start"]
     frame_end = frame_timings["frame"]["end"]
@@ -99,27 +131,19 @@ def plot_frame(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
     frame_timings = (frame_timings - frame_start).dt.seconds
     resource_data.index = (resource_data.index - frame_start).seconds
 
-    fig, ((cpu_ax, mem_ax), (gpu_util_ax, gpu_mem_ax)) = plt.subplots(2, 2)
+    fig, (cpu_ax, mem_ax) = plt.subplots(1, 2)
 
     cpu_ax.set_title("Number of used CPU cores")
     mem_ax.set_title("RAM usage in GB")
-    gpu_util_ax.set_title("GPU utilization in %")
-    gpu_mem_ax.set_title("GPU memory usage in GB")
 
     cpu_ax.plot(resource_data.index, resource_data["n_cpus"])
     mem_ax.plot(resource_data.index, resource_data["memory"])
-    gpu_util_ax.plot(resource_data.index, resource_data["gpu_util"])
-    gpu_mem_ax.plot(resource_data.index, resource_data["gpu_memory"])
 
     cpu_ax.xaxis.set_major_formatter(MyFormatter())
     mem_ax.xaxis.set_major_formatter(MyFormatter())
-    gpu_util_ax.xaxis.set_major_formatter(MyFormatter())
-    gpu_mem_ax.xaxis.set_major_formatter(MyFormatter())
 
     cpu_ax.set_ylim(bottom=0)
     mem_ax.set_ylim(bottom=0)
-    gpu_util_ax.set_ylim(bottom=0)
-    gpu_mem_ax.set_ylim(bottom=0)
 
     cpu_ax.set_xticks(np.arange(0, resource_data.index.max(), 60))
     cpu_ax.set_xticklabels(cpu_ax.get_xticklabels(), rotation=50)
@@ -157,4 +181,7 @@ def plot_frame(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
 
 resource_data = parse_resources_file(resource_file)
 timings = parse_timings(metadata)
-plot_frame(resource_data, timings.loc[1, :])
+
+plot_cpu_ram(resource_data, timings.loc[1, :])
+if TOOLBOX_SUPPORTS_GPU[TOOLBOX]:
+    plot_gpu(resource_data, timings.loc[1, :])
