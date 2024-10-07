@@ -1,4 +1,5 @@
 import json
+import re
 
 import numpy as np
 import pandas as pd
@@ -6,8 +7,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import Formatter
 
 
-resource_file = "results/2024-10-04-13-46-b9d60b5/NiftyPET/resources.csv"
-metadata_file = "results/2024-10-04-13-46-b9d60b5/NiftyPET/metadata.json"
+resource_file = "results/2024-10-04-16-24-afbd5f5/SIRF-STIR/resources.csv"
+metadata_file = "results/2024-10-04-16-24-afbd5f5/SIRF-STIR/metadata.json"
 
 
 def parse_resources_file(datafile: str) -> pd.DataFrame:
@@ -120,8 +121,19 @@ def plot_frame(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
 
     cpu_ax.set_xticks(np.arange(0, resource_data.index.max(), 60))
     cpu_ax.set_xticklabels(cpu_ax.get_xticklabels(), rotation=50)
+    cmap = plt.get_cmap("tab20")
 
-    for block_name in frame_timings.index.levels[0].drop("frame"):
+    get_blocklable = lambda block_name: re.match(
+        r"^([a-zA-Z]+)(?:_itr\d+)?$", block_name
+    ).group(1)
+    block_names = frame_timings.index.levels[0].drop("frame")
+    # Extract labels without the `_itrX` suffix
+    # Put into list to preserve order for colors
+    block_labels = list({get_blocklable(block_name) for block_name in block_names})
+    existing_labels = set()
+
+    for block_name in block_names:
+        block_label = get_blocklable(block_name)
         block_start = frame_timings[block_name]["start"]
         block_end = frame_timings[block_name]["end"]
         if block_start == block_end:
@@ -131,10 +143,12 @@ def plot_frame(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
             frame_timings[block_name]["start"],
             frame_timings[block_name]["end"],
             alpha=0.3,
-            label=block_name,
+            label=(block_label if block_label not in existing_labels else None),
+            color=cmap(block_labels.index(get_blocklable(block_name))),
         )
+        existing_labels.add(block_label)
+    cpu_ax.legend()
 
-    plt.legend()
     plt.tight_layout()
     plt.show()
 
