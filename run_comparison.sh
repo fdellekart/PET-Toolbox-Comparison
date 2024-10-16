@@ -6,6 +6,7 @@
 TARGET_DIRS=(NiftyPET SIRF-STIR)
 GIT_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)
 GPU_DEVICE_ID=0
+DISK_ID="nvme0n1"
 
 printf -v date '%(%Y-%m-%d-%H-%M)T' -1
 export OUTPUT_VERSION_DIR=${date}-${GIT_COMMIT_SHORT_SHA}
@@ -25,13 +26,15 @@ trap cleanup SIGINT
 # Function to capture stats and append them to CSV
 capture_stats() {
     gpu_stats=$(nvidia-smi -i $GPU_DEVICE_ID --query-gpu memory.used,utilization.gpu --format=csv,noheader)
+    disk_read=$(iostat -m 1 2 | tail -20 | grep $DISK_ID | awk '{print $2}')
+    disk_write=$(iostat -m 1 2 | tail -20 | grep $DISK_ID | awk '{print $3}')
     docker stats --no-stream --format \
-    "{{.CPUPerc}},{{.MemPerc}},{{.MemUsage}},{{.BlockIO}}" $CONTAINER_NAME | \
+    "{{.CPUPerc}},{{.MemPerc}},{{.MemUsage}}" $CONTAINER_NAME | \
     while IFS= read -r line; do
         # Get current timestamp
         timestamp=$(date --utc '+%Y-%m-%d %H:%M:%S')
         # Append to CSV with timestamp
-        echo "$timestamp,$line,$gpu_stats" >> $STAT_LOG_PATH
+        echo "$timestamp,$line,$gpu_stats,$disk_read,$disk_write" >> $STAT_LOG_PATH
     done
 }
 
@@ -41,7 +44,7 @@ for target in ${TARGET_DIRS[@]}; do
     STAT_LOG_PATH=${DESTINATION_DIR}/resources.csv
 
     mkdir "${DESTINATION_DIR}"
-    echo "Timestamp,CPU_Usage(%),Memory_Usage(%),Memory_Usage/Limit,Block_I/O,GPU_Memory,GPU_Utilization" > $STAT_LOG_PATH
+    echo "Timestamp,CPU_Usage(%),Memory_Usage(%),Memory_Usage/Limit,GPU_Memory,GPU_Utilization,Disk_Read,Disk_Written" > $STAT_LOG_PATH
 
     cd $target
 
