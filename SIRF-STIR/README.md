@@ -13,7 +13,7 @@ The following files must be present inside the input directory:
 - hardware_umap.nii
 - `.dcm` and `.bf` files for listmode data
 - `.dcm` and `.bf` files for normalization
-- A directory called `MRAC` with MRAC images
+- A directory called `MRAC` with MRAC images (`.IMA` files)
 
 When all those files are present you can start the pipeline by running `./run_recon.sh`.
 The container will convert the Siemens input files to the STIR data format if files in this format are not yet present.

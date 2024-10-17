@@ -9,8 +9,9 @@ def parse_resources_file(datafile: str) -> pd.DataFrame:
     by the comparison script into a dataframe.
 
     :param datafile: path to a resources.csv file from a toolbox
-    :return: A dataframe with columns 'memory', 'gpu_memory', 'n_cpus'
-        Memory values are in GiB, utilization in %
+    :return: A dataframe with columns 'time', 'n_cpus',
+        'memory', 'gpu_util' 'gpu_memory', `disk_read`, `disk_written`
+        Memory values are in GiB, disk read/written in GiB / s, utilization in %
     """
     data = (
         pd.read_csv(datafile)
@@ -47,6 +48,9 @@ def parse_resources_file(datafile: str) -> pd.DataFrame:
     data["gpu_util"] = data["gpu_util"].str[:-2].astype(np.float32)
     assert data["gpu_memory"].str.endswith("MiB").all()
     data["gpu_memory"] = data["gpu_memory"].str[:-4].astype(np.float32) / 1000
+
+    data["disk_written"] = data["disk_written"].astype(np.float32) / 1000
+    data["disk_read"] = data["disk_read"].astype(np.float32) / 1000
 
     return data
 
