@@ -63,3 +63,33 @@ def plot_gpu(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
 
     plt.tight_layout()
     plt.show()
+
+
+def plot_disk(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
+    fig, (read_ax, write_ax) = plt.subplots(1, 2)
+
+    read_ax.set_title("Amount of data read from Disk in MB/s")
+    write_ax.set_title("Amount of data written to disk in MB/s")
+
+    read_ax.plot(resource_data.index, resource_data["disk_read"])
+    write_ax.plot(resource_data.index, resource_data["disk_written"])
+
+    read_ax.xaxis.set_major_formatter(MyFormatter())
+    write_ax.xaxis.set_major_formatter(MyFormatter())
+
+    read_ax.set_ylim(bottom=0)
+    write_ax.set_ylim(bottom=0)
+
+    read_ax.set_xticks(np.arange(0, resource_data.index.max(), 60))
+    read_ax.set_xticklabels(read_ax.get_xticklabels(), rotation=50)
+
+    write_ax.set_xticks(np.arange(0, resource_data.index.max(), 60))
+    write_ax.set_xticklabels(write_ax.get_xticklabels(), rotation=50)
+
+    add_blocks_to_ax(read_ax, frame_timings)
+    add_blocks_to_ax(write_ax, frame_timings)
+
+    read_ax.legend()
+
+    plt.tight_layout()
+    plt.show()

@@ -22,6 +22,8 @@ def parse_resources_file(datafile: str) -> pd.DataFrame:
                 "Memory_Usage/Limit": "memory",
                 "GPU_Memory": "gpu_memory",
                 "GPU_Utilization": "gpu_util",
+                "Disk_Read": "disk_read",
+                "Disk_Written": "disk_written",
             },
             axis=1,
         )
