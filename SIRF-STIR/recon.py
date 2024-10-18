@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import nibabel as nib
 from sirf.STIR import *
+import sirf.Reg as reg
 
 from utils import get_intervals, get_file_with_suffix, ReconMetadata
 
@@ -181,7 +182,9 @@ def make_scatter_estimate(
 
     meta.end_block("scatter")
 
-    return se.get_output() / 1000
+    return (
+        se.get_output() / 1000
+    )  # TODO: find out why this looks so bad. It should be a quite uniform background
 
 
 def make_acquisiton_model(
@@ -244,11 +247,12 @@ def reconstruct(
     return recon.get_output()
 
 
-def reconstruct_frame(time_start, time_end) -> np.array:
+def reconstruct_frame(time_start: int, time_end: int, frame_idx: int) -> np.array:
     """Run reconstruction for a single frame.
 
     :param time_start: Start of frame in seconds from beginning
     :param time_end: End of frame in seconds from beginning
+    :param frame_idx: Index of the current frame
     """
     acq_data, randoms = make_sinogram(list_file, time_start, time_end)
     attenuation_image = load_attenuation_image(attn_file, acq_data)
@@ -266,6 +270,8 @@ def reconstruct_frame(time_start, time_end) -> np.array:
 
     recon = reconstruct(acq_data, acq_model, initial_image)
 
+    reg.NiftiImageData(recon).write(f"./output/frame_{frame_idx}.nii")
+
     return recon.as_array()
 
 
@@ -276,20 +282,10 @@ for current_frame_idx, (interval_start, interval_end) in enumerate(intervals, 1)
     meta.start_frame()
     print(f"Reconstructing frame {current_frame_idx}")
 
-    frame = reconstruct_frame(interval_start, interval_end)
+    frame = reconstruct_frame(interval_start, interval_end, current_frame_idx)
     result.append(frame)
     meta.end_frame()
 
 meta.end()
 meta.save(output_path)
 print(f"Processing took {meta.total_duration}")
-
-# Move time axis to where nifty expects it
-result = np.moveaxis(np.array(result), 0, -1)
-# Get the image into a common orientation
-result = np.swapaxes(result, 0, 2)
-result = np.flip(result, (0, 1, 2))
-
-result_image = nib.Nifti1Image(result, affine=np.eye(4))
-
-nib.save(result_image, output_path / "result.nii.gz")

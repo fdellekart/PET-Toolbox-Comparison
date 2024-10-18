@@ -1,0 +1,8 @@
+FROM vistalab/fsl-v5.0
+
+WORKDIR /work
+
+COPY docker-entrypoint-fslmerge.sh docker-entrypoint-fslmerge.sh
+RUN chmod a+x docker-entrypoint-fslmerge.sh
+
+ENTRYPOINT [ "/work/docker-entrypoint-fslmerge.sh" ]

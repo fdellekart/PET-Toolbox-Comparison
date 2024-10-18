@@ -13,7 +13,8 @@ ENV GIT_COMMIT_SHORT_SHA=$GIT_COMMIT_SHORT_SHA
 
 WORKDIR /home/jovyan
 RUN fix-permissions "${CONDA_DIR}" /home/${NB_USER}
-RUN apt install -y cmake git libgoogle-glog-dev libinsighttoolkit5-dev libboost-all-dev
+RUN apt-get update
+RUN apt-get install -y cmake git libgoogle-glog-dev libinsighttoolkit5-dev libboost-all-dev
 
 RUN git clone https://github.com/UCL/pet-rd-tools.git
 WORKDIR /home/jovyan/pet-rd-tools
