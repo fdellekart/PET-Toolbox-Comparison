@@ -19,8 +19,13 @@ class MyFormatter(Formatter):
 
 def add_blocks_to_ax(ax: plt.Axes, frame_timings: pd.Series):
     """Add vspan colorings to axes for individual blocks inside frame timings.
-    Blocks of the format '<block_name>_itr<n>' is labeled and colored
-    only once with `block_name`.
+
+    :param ax: the mpl axes object to draw on
+    :param frame_timings: A series with a multiindex with block names on
+        first level and 'start' or 'end' on second level indicating the
+        start and end times of the individual blocks in seconds from start.
+        Blocks of the format '<block_name>_itr<n>' are labeled and colored
+        only once with `block_name`.
     """
     cmap = plt.get_cmap("tab20")
     block_names = frame_timings.index.levels[0].drop("frame")
