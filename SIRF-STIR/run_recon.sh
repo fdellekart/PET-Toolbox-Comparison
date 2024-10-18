@@ -9,8 +9,10 @@ WORKDIR=/home/jovyan/work/recon
 
 docker container rm sirf-stir-recon
 docker container rm fslmerge
-docker build --build-arg=GIT_COMMIT_SHORT_SHA=$GIT_COMMIT_SHORT_SHA -t sirf-recon .
-docker build -f Dockerfile-fslmerge -t fslmerge .
+if [ "$1" = "--build" ]; then
+    docker build --build-arg=GIT_COMMIT_SHORT_SHA=$GIT_COMMIT_SHORT_SHA -t sirf-recon .
+    docker build -f Dockerfile-fslmerge -t fslmerge .
+fi
 
 echo "Running reconstruction with SIRF."
 echo "To see container logs run 'docker logs -t -f --since=5m sirf-stir-recon'."

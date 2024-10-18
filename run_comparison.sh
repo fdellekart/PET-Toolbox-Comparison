@@ -2,6 +2,8 @@
 
 # This script runs the reconstruction and evaluation for all
 # specified targets and saves images and metadata to results
+# The first (and currently only!) parameter can be --build to rebuild
+# the docker images
 
 TARGET_DIRS=(NiftyPET SIRF-STIR)
 GIT_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)
@@ -48,7 +50,7 @@ for target in ${TARGET_DIRS[@]}; do
 
     cd $target
 
-    ./run_recon.sh /dev/null 2>&1 &
+    ./run_recon.sh $1 /dev/null 2>&1 &
     task_pid=$!
     echo "Logging resource information to ${STAT_LOG_PATH}"
     while kill -0 "$task_pid" 2>/dev/null; do
@@ -63,7 +65,7 @@ for target in ${TARGET_DIRS[@]}; do
 
     cd ../image_evaluation
     cp ${DESTINATION_DIR}/result.nii.gz ./data/sub-00/pet/result.nii.gz
-    ./run_eval.sh
+    ./run_eval.sh $1
 
     echo "Copying normalized images and evaluation results to ${DESTINATION_DIR}"
     cp ./data/pet_mni4d.nii.gz ${DESTINATION_DIR}/pet_mni4d.nii.gz

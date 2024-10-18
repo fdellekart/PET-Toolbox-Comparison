@@ -1,10 +1,14 @@
 #!/bin/bash
 
+
+
 docker container rm image-normalization
 docker container rm image-analysis
 
-docker build -f Dockerfile-normalize -t image-normalization .
-docker build -f Dockerfile-analysis -t image-analysis .
+if [ "$1" = "--build" ]; then
+    docker build -f Dockerfile-normalize -t image-normalization .
+    docker build -f Dockerfile-analysis -t image-analysis .
+fi
 
 echo "Normalizing images to MNI space."
 container_id=$(docker run -d --name=image-normalization -v ./data:/work/data image-normalization)

@@ -10,7 +10,10 @@ GIT_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)
 WORKDIR=/var/work
 
 docker container rm niftypet-recon
-docker build --build-arg=CACHEBUST=$(date +%s) --build-arg=GIT_COMMIT_SHORT_SHA=$GIT_COMMIT_SHORT_SHA -t niftypet-recon .
+if [ "$1" = "--build" ]; then
+    # Cachebust necessary to repull from the fork which could have changed
+    docker build --build-arg=CACHEBUST=$(date +%s) --build-arg=GIT_COMMIT_SHORT_SHA=$GIT_COMMIT_SHORT_SHA -t niftypet-recon .
+fi
 
 echo "Running reconstruction with NiftyPET."
 echo "To see container logs run 'docker logs -t -f --since=5m niftypet-recon'."
