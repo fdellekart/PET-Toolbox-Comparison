@@ -15,8 +15,20 @@ docker build -f Dockerfile-fslmerge -t fslmerge .
 echo "Running reconstruction with SIRF."
 echo "To see container logs run 'docker logs -t -f --since=5m sirf-stir-recon'."
 
-docker run -d --name=sirf-stir-recon -v ${PWD}/input:${WORKDIR}/input -v ${PWD}/output:${WORKDIR}/output sirf-recon recon $TIME_START $TIME_END $TIME_STEP
-docker wait sirf-stir-recon
+container_id=$(docker run -d --name=sirf-stir-recon -v ${PWD}/input:${WORKDIR}/input -v ${PWD}/output:${WORKDIR}/output sirf-recon recon $TIME_START $TIME_END $TIME_STEP)
+status_code=$(docker wait sirf-stir-recon)
 
-docker run -d --name=fslmerge -v ${PWD}/output:/work/output fslmerge
-docker wait fslmerge
+if [ $status_code -ne 0 ]; then
+    echo "Error in SIRF-STIR reconstruction"
+    echo "Run 'docker logs ${container_id}' to view container logs"
+    exit 1
+fi
+
+container_id=$(docker run -d --name=fslmerge -v ${PWD}/output:/work/output fslmerge)
+status_code=$(docker wait fslmerge)
+
+if [ $status_code -ne 0 ]; then
+    echo "Error in when merging frames using FSL"
+    echo "Run 'docker logs ${container_id}' to view container logs"
+    exit $status_code
+fi

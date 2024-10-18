@@ -13,7 +13,7 @@ status_code=$(docker wait image-normalization)
 if [ $status_code -ne 0 ]; then
     echo "Error in image normalization"
     echo "Run 'docker logs ${container_id}' to view container logs"
-    exit 1
+    exit $status_code
 fi
 
 echo "Running image quality evaluation"
@@ -23,5 +23,5 @@ status_code=$(docker wait image-analysis)
 if [ $status_code -ne 0 ]; then
     echo "Error in image quality evaluation"
     echo "Run 'docker logs ${container_id}' to view container logs"
-    exit 1
+    exit $status_code
 fi
