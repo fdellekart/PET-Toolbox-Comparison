@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # NiftyPET has a bug that leads to exceptions for empty frames
-# Start seven frames later to avoid the first frames without activity
-TIME_START=1200
-TIME_END=1260
+# Start five minutes into scan to avoid the first frames without activity
+TIME_START=300
+TIME_END=3180
 TIME_STEP=30
 
 GIT_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)

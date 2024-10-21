@@ -1,7 +1,7 @@
 #!/bin/bash
 
-TIME_START=1200
-TIME_END=1260
+TIME_START=0
+TIME_END=3180
 TIME_STEP=30
 
 GIT_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)
