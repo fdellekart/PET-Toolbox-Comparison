@@ -1,5 +1,7 @@
 """Utilities to load metadata and timing information"""
 
+from typing import Tuple
+
 import pandas as pd
 import numpy as np
 
@@ -77,16 +79,25 @@ def parse_timings(metadata: dict) -> pd.DataFrame:
 
 
 def prepare_for_single_frame_plot(
-    resource_data: pd.DataFrame, frame_timings: pd.Series
-) -> pd.DataFrame:
-    """Extract frame from resource data and time everything in seconds relative to start."""
-    frame_start = frame_timings["frame"]["start"]
-    frame_end = frame_timings["frame"]["end"]
+    resource_data: pd.DataFrame, frame_timings: pd.DataFrame, frame_index: int
+) -> Tuple[pd.DataFrame, pd.Series]:
+    """Extract frame from resource data and time everything in seconds relative to start.
+
+    :param resource_data: DataFrame with DatetimeIndex
+    :param frame_timings: Timing information for all frames as loaded from resources.csv
+    :param frame_index: Index of the frame to create the plot for
+    :return: resource_data: Extracted data for specified frame
+                            with index in seconds from frame start
+             single_frame_timings: Timing information of the frame
+    """
+    single_frame_timings = frame_timings.loc[frame_index, :]
+    frame_start = single_frame_timings["frame"]["start"]
+    frame_end = single_frame_timings["frame"]["end"]
     is_in_frame = (resource_data.index > frame_start) & (
         resource_data.index < frame_end
     )
     resource_data = resource_data[is_in_frame]
-    frame_timings = (frame_timings - frame_start).dt.seconds
+    single_frame_timings = (single_frame_timings - frame_start).dt.seconds
     resource_data.index = (resource_data.index - frame_start).seconds
 
-    return resource_data, frame_timings
+    return resource_data, single_frame_timings

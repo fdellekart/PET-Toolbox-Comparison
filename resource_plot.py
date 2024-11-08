@@ -19,12 +19,9 @@ with open(metadata_file) as f:
     metadata = json.load(f)
 
 timings = parse_timings(metadata)
-frame_timings = timings.loc[0, :]
 
 resource_data = parse_resources_file(resource_file)
-resource_data, frame_timings = prepare_for_single_frame_plot(
-    resource_data, frame_timings
-)
+resource_data, frame_timings = prepare_for_single_frame_plot(resource_data, timings, 25)
 
 plot_disk(resource_data, frame_timings)
 plot_cpu_ram(resource_data, frame_timings)
