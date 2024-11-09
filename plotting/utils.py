@@ -14,7 +14,8 @@ class MyFormatter(Formatter):
     def __call__(self, x, pos=0):
         minutes = int(x // 60)
         seconds = int(x % 60)
-        return f"{'0' if minutes < 10 else ''}{minutes}:{'0' if seconds < 10 else ''}{seconds}"
+        assert seconds == 0
+        return f"{minutes}"
 
 
 def add_blocks_to_ax(ax: plt.Axes, frame_timings: pd.Series):
