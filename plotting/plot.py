@@ -4,6 +4,7 @@ from typing import Optional
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 
 from plotting.utils import add_blocks_to_ax, MyFormatter
 
@@ -36,9 +37,13 @@ def plot_cpu_ram(
     add_blocks_to_ax(cpu_ax, frame_timings)
     add_blocks_to_ax(mem_ax, frame_timings)
 
-    cpu_ax.legend()
+    handles, labels = cpu_ax.get_legend_handles_labels()
+    handles[-2], handles[-1] = handles[-1], handles[-2]
+    labels[-2], labels[-1] = labels[-1], labels[-2]
 
-    plt.tight_layout()
+    fig.legend(handles, labels, ncols=4, loc="lower center", frameon=False)
+
+    plt.tight_layout(rect=[0, 0.05, 1, 1])
 
     if target_file is None:
         plt.show()
@@ -75,9 +80,13 @@ def plot_gpu(
     add_blocks_to_ax(gpu_util_ax, frame_timings)
     add_blocks_to_ax(gpu_mem_ax, frame_timings)
 
-    gpu_util_ax.legend()
+    handles, labels = gpu_util_ax.get_legend_handles_labels()
+    handles[-2], handles[-1] = handles[-1], handles[-2]
+    labels[-2], labels[-1] = labels[-1], labels[-2]
 
-    plt.tight_layout()
+    fig.legend(handles, labels, ncols=4, loc="lower center", frameon=False)
+
+    plt.tight_layout(rect=[0, 0.05, 1, 1])
 
     if target_file is None:
         plt.show()
@@ -114,9 +123,13 @@ def plot_disk(
     add_blocks_to_ax(read_ax, frame_timings)
     add_blocks_to_ax(write_ax, frame_timings)
 
-    read_ax.legend()
+    handles, labels = read_ax.get_legend_handles_labels()
+    handles[-2], handles[-1] = handles[-1], handles[-2]
+    labels[-2], labels[-1] = labels[-1], labels[-2]
 
-    plt.tight_layout()
+    fig.legend(handles, labels, ncols=4, loc="lower center", frameon=False)
+
+    plt.tight_layout(rect=[0, 0.05, 1, 1])
 
     if target_file is None:
         plt.show()
