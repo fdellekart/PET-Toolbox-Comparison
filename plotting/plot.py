@@ -14,7 +14,7 @@ def plot_cpu_ram(
     frame_timings: pd.Series,
     target_file: Optional[Path] = None,
 ) -> None:
-    fig, (cpu_ax, mem_ax) = plt.subplots(1, 2)
+    fig, (cpu_ax, mem_ax) = plt.subplots(1, 2, figsize=(7, 5), dpi=300)
 
     cpu_ax.set_ylabel("CPU utilization [$n_{cores}$]")
     mem_ax.set_ylabel("Memory usage [GB]")
@@ -57,7 +57,7 @@ def plot_gpu(
     frame_timings: pd.Series,
     target_file: Optional[Path] = None,
 ) -> None:
-    fig, (gpu_util_ax, gpu_mem_ax) = plt.subplots(1, 2)
+    fig, (gpu_util_ax, gpu_mem_ax) = plt.subplots(1, 2, figsize=(7, 5), dpi=300)
 
     gpu_util_ax.set_ylabel("GPU utilization [%]")
     gpu_mem_ax.set_ylabel("GPU memory usage [GB]")
@@ -100,7 +100,7 @@ def plot_disk(
     frame_timings: pd.Series,
     target_file: Optional[Path] = None,
 ) -> None:
-    fig, (read_ax, write_ax) = plt.subplots(1, 2)
+    fig, (read_ax, write_ax) = plt.subplots(1, 2, figsize=(7, 5), dpi=300)
 
     read_ax.set_title("Data read from disk")
     write_ax.set_title("Data written to disk")
