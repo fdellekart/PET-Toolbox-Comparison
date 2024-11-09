@@ -16,8 +16,8 @@ def plot_cpu_ram(
 ) -> None:
     fig, (cpu_ax, mem_ax) = plt.subplots(1, 2)
 
-    cpu_ax.set_title("Number of used CPU cores")
-    mem_ax.set_title("RAM usage in GB")
+    cpu_ax.set_ylabel("CPU utilization [$n_{cores}$]")
+    mem_ax.set_ylabel("Memory usage [GB]")
 
     cpu_ax.plot(resource_data.index, resource_data["n_cpus"])
     mem_ax.plot(resource_data.index, resource_data["memory"])
@@ -59,8 +59,8 @@ def plot_gpu(
 ) -> None:
     fig, (gpu_util_ax, gpu_mem_ax) = plt.subplots(1, 2)
 
-    gpu_util_ax.set_title("GPU utilization in %")
-    gpu_mem_ax.set_title("GPU memory usage in GB")
+    gpu_util_ax.set_ylabel("GPU utilization [%]")
+    gpu_mem_ax.set_ylabel("GPU memory usage [GB]")
 
     gpu_util_ax.plot(resource_data.index, resource_data["gpu_util"])
     gpu_mem_ax.plot(resource_data.index, resource_data["gpu_memory"])
@@ -102,8 +102,9 @@ def plot_disk(
 ) -> None:
     fig, (read_ax, write_ax) = plt.subplots(1, 2)
 
-    read_ax.set_title("Amount of data read from Disk in MB/s")
-    write_ax.set_title("Amount of data written to disk in MB/s")
+    read_ax.set_title("Data read from disk")
+    write_ax.set_title("Data written to disk")
+    read_ax.set_ylabel("MB/s")
 
     read_ax.plot(resource_data.index, resource_data["disk_read"])
     write_ax.plot(resource_data.index, resource_data["disk_written"])
