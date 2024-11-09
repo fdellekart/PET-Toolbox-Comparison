@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Optional
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -5,7 +8,11 @@ import matplotlib.pyplot as plt
 from plotting.utils import add_blocks_to_ax, MyFormatter
 
 
-def plot_cpu_ram(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
+def plot_cpu_ram(
+    resource_data: pd.DataFrame,
+    frame_timings: pd.Series,
+    target_file: Optional[Path] = None,
+) -> None:
     fig, (cpu_ax, mem_ax) = plt.subplots(1, 2)
 
     cpu_ax.set_title("Number of used CPU cores")
@@ -32,10 +39,19 @@ def plot_cpu_ram(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
     cpu_ax.legend()
 
     plt.tight_layout()
-    plt.show()
+
+    if target_file is None:
+        plt.show()
+    else:
+        plt.savefig(target_file)
+    plt.close()
 
 
-def plot_gpu(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
+def plot_gpu(
+    resource_data: pd.DataFrame,
+    frame_timings: pd.Series,
+    target_file: Optional[Path] = None,
+) -> None:
     fig, (gpu_util_ax, gpu_mem_ax) = plt.subplots(1, 2)
 
     gpu_util_ax.set_title("GPU utilization in %")
@@ -62,10 +78,19 @@ def plot_gpu(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
     gpu_util_ax.legend()
 
     plt.tight_layout()
-    plt.show()
+
+    if target_file is None:
+        plt.show()
+    else:
+        plt.savefig(target_file)
+    plt.close()
 
 
-def plot_disk(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
+def plot_disk(
+    resource_data: pd.DataFrame,
+    frame_timings: pd.Series,
+    target_file: Optional[Path] = None,
+) -> None:
     fig, (read_ax, write_ax) = plt.subplots(1, 2)
 
     read_ax.set_title("Amount of data read from Disk in MB/s")
@@ -92,4 +117,9 @@ def plot_disk(resource_data: pd.DataFrame, frame_timings: pd.Series) -> None:
     read_ax.legend()
 
     plt.tight_layout()
-    plt.show()
+
+    if target_file is None:
+        plt.show()
+    else:
+        plt.savefig(target_file)
+    plt.close()
