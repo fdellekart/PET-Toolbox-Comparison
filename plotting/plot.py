@@ -18,6 +18,8 @@ def plot_cpu_ram(
 
     cpu_ax.set_ylabel("CPU utilization [$n_{cores}$]")
     mem_ax.set_ylabel("Memory usage [GB]")
+    if resource_data["n_cpus"].max() < 1.05:
+        cpu_ax.set_ylim(0, 1.05)
 
     cpu_ax.plot(resource_data.index, resource_data["n_cpus"])
     mem_ax.plot(resource_data.index, resource_data["memory"])
