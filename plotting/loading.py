@@ -1,9 +1,14 @@
 """Utilities to load metadata and timing information"""
 
+import os
+from pathlib import Path
 from typing import Tuple
 
 import pandas as pd
 import numpy as np
+
+
+E7_LOG_START_OF_MSG_COL_IDX = 39
 
 
 def parse_resources_file(datafile: str) -> pd.DataFrame:
@@ -101,3 +106,61 @@ def prepare_for_single_frame_plot(
     resource_data.index = (resource_data.index - frame_start).seconds
 
     return resource_data, single_frame_timings
+
+
+def fix_e7_log_column_lengths(
+    filepath: Path, fixed_col_length_file: Path, force: bool = False
+) -> None:
+    """So that e7 logs can be read with pd.read_fwf,
+    message column is padded with whitespace where messages
+    are shorter than the maximum message length.
+    First line is removed from the log.
+
+    :param filepath: Path to e7 tools log ouput
+    :param transformed_filepath: Path to write result to
+    :param force: Do not skip if transformed file exists
+    """
+    if not os.path.exists(fixed_col_length_file) or force:
+        with open(filepath, "r") as f:
+            next(f)  # Drop header
+            log_lines = f.readlines()
+
+        max_msg_col_length = max(len(line) for line in log_lines)
+
+        with open(fixed_col_length_file, "w") as f:
+            for original_line in log_lines:
+                msg_col_length = len(original_line) - E7_LOG_START_OF_MSG_COL_IDX
+                new_line = (
+                    original_line[:-1]
+                    + " " * (max_msg_col_length - msg_col_length)
+                    + "\n"
+                )
+                f.write(new_line)
+
+
+def load_e7_frame_timings(fixed_col_length_file: Path) -> pd.DataFrame:
+    """Parse e7 tools log file into common dataframe
+    with duration information of frames
+
+    :param fixed_col_length_file: Preprocessed file with a constant colum length
+    :return: Dataframe with frame timings
+    """
+    with open(fixed_col_length_file, "r") as f:
+        max_msg_col_length = len(f.readline())
+
+    data = pd.read_fwf(
+        fixed_col_length_file, colspecs=[(0, 1), (2, 25), (38, max_msg_col_length)]
+    )
+    data.columns = ["msg_type", "time", "msg"]
+    data["time"] = pd.to_datetime(data["time"])
+    data.set_index("time", inplace=True)
+    data["msg"] = data["msg"].str.strip()
+    cond_start = data["msg"].str.startswith("axis table=4084").fillna(False)
+    cond_end = data["msg"].str.startswith("finished calculation of image").fillna(False)
+
+    frame_starts = data[cond_start].index
+    frame_ends = data[cond_end].index
+
+    return pd.DataFrame(
+        data={("frame", "start"): frame_starts, ("frame", "end"): frame_ends}
+    )
