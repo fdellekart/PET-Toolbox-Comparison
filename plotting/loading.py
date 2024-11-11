@@ -161,8 +161,33 @@ def load_e7_frame_timings(fixed_col_length_file: Path) -> pd.DataFrame:
     frame_starts = data[cond_start].index
     frame_ends = data[cond_end].index
 
+    cond_start = (
+        data["msg"].str.contains("Start Scatter Simulation Iteration 1").fillna(False)
+    )
+    cond_end = (
+        data["msg"].str.contains("End Scatter Simulation Iteration 2").fillna(False)
+    )
+    scatter_starts = data[cond_start].index
+    scatter_ends = data[cond_end].index
+
+    cond_start = (
+        data["msg"]
+        .str.contains("start reconstruction from 344x252x837 to 344x344x127")
+        .fillna(False)
+    )
+    cond_end = data["msg"].str.contains("finished reconstruction").fillna(False)
+    recon_starts = data[cond_start].index
+    recon_ends = data[cond_end].index[2::3]
+
     return pd.DataFrame(
-        data={("frame", "start"): frame_starts, ("frame", "end"): frame_ends}
+        data={
+            ("frame", "start"): frame_starts,
+            ("frame", "end"): frame_ends,
+            ("scatter", "start"): scatter_starts,
+            ("scatter", "end"): scatter_ends,
+            ("recon", "start"): recon_starts,
+            ("recon", "end"): recon_ends,
+        }
     )
 
 
