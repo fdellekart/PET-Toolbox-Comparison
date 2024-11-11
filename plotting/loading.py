@@ -164,3 +164,24 @@ def load_e7_frame_timings(fixed_col_length_file: Path) -> pd.DataFrame:
     return pd.DataFrame(
         data={("frame", "start"): frame_starts, ("frame", "end"): frame_ends}
     )
+
+
+def parse_e7_resource_file(resources_path: Path) -> pd.DataFrame:
+    """Load the resource log created by the powershell script
+    running in parallel to the e7-tools reconstruction. The format
+    is slightly different from what the Linux version uses just
+    because I didn't bother to check back while writing it.
+
+    :param resources_path: path to the csv file
+    :return: dataframe in the same format as returned by parse_resource_file
+    """
+    return (
+        pd.read_csv(resources_path)
+        .astype({"time": "datetime64[ns]"})
+        .set_index("time")
+        .rename({"cpu_cores": "n_cpus", "disk_write": "disk_written"}, axis=1)
+        .assign(
+            memory=lambda df: df.memory / 1000,
+            gpu_memory=lambda df: df.gpu_memory / 1000,
+        )
+    )
