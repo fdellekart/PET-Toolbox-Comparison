@@ -37,8 +37,11 @@ def plot_cpu_ram(
     add_blocks_to_ax(mem_ax, frame_timings)
 
     handles, labels = cpu_ax.get_legend_handles_labels()
-    handles[-2], handles[-1] = handles[-1], handles[-2]
-    labels[-2], labels[-1] = labels[-1], labels[-2]
+
+    if len(handles) >= 2:
+        handles[-2], handles[-1] = handles[-1], handles[-2]
+        labels[-2], labels[-1] = labels[-1], labels[-2]
+
     fig.legend(handles, labels, ncols=4, loc="lower center", frameon=False)
 
     plt.tight_layout(rect=[0, 0.05, 1, 1])
@@ -78,8 +81,9 @@ def plot_gpu(
     add_blocks_to_ax(gpu_mem_ax, frame_timings)
 
     handles, labels = gpu_util_ax.get_legend_handles_labels()
-    handles[-2], handles[-1] = handles[-1], handles[-2]
-    labels[-2], labels[-1] = labels[-1], labels[-2]
+    if len(handles) >= 2:
+        handles[-2], handles[-1] = handles[-1], handles[-2]
+        labels[-2], labels[-1] = labels[-1], labels[-2]
 
     fig.legend(handles, labels, ncols=4, loc="lower center", frameon=False)
 
@@ -119,8 +123,9 @@ def plot_disk(
     add_blocks_to_ax(write_ax, frame_timings)
 
     handles, labels = read_ax.get_legend_handles_labels()
-    handles[-2], handles[-1] = handles[-1], handles[-2]
-    labels[-2], labels[-1] = labels[-1], labels[-2]
+    if len(handles) >= 2:
+        handles[-2], handles[-1] = handles[-1], handles[-2]
+        labels[-2], labels[-1] = labels[-1], labels[-2]
 
     fig.legend(handles, labels, ncols=4, loc="lower center", frameon=False)
 
