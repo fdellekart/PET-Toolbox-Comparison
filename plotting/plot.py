@@ -192,19 +192,19 @@ def plot_e7_frame(
     plot_disk(
         frame_data,
         frame_timings,
-        target_dir / f"e7-tools_disk_frame{frame_nr}.png",
+        target_dir / f"e7-tools{"-gpu" if gpu else ""}_disk_frame{frame_nr}.png",
         vert_line_pos,
     )
     plot_cpu_ram(
         frame_data,
         frame_timings,
-        target_dir / f"e7-tools_cpu_ram_frame{frame_nr}.png",
+        target_dir / f"e7-tools{"-gpu" if gpu else ""}_cpu&ram_frame{frame_nr}.png",
         vert_line_pos,
     )
     if gpu:
         plot_gpu(
             frame_data,
             frame_timings,
-            target_dir / f"e7-tools_gpu_frame{frame_nr}.png",
+            target_dir / f"e7-tools{"-gpu" if gpu else ""}_gpu_frame{frame_nr}.png",
             vert_line_pos,
         )

@@ -5,8 +5,9 @@ from plotting.loading import (
     parse_timings,
     parse_resources_file,
     prepare_for_single_frame_plot,
+    load_e7_resources_and_timings,
 )
-from plotting.plot import plot_cpu_ram, plot_gpu, plot_disk
+from plotting.plot import plot_cpu_ram, plot_gpu, plot_disk, plot_e7_frame
 
 RUNDIR = Path("results")
 PLOT_PATH_TEMPLATE = "results/plots/{toolbox}_{resource_type}_frame{frame_nr}.png"
@@ -38,3 +39,14 @@ for toolbox in TOOLBOXES:
     )
     if TOOLBOX_SUPPORTS_GPU[toolbox]:
         plot_gpu(resource_data, frame_timings, get_plotpath(toolbox, "gpu", FRAME_NR))
+
+
+timing_and_resource_info = load_e7_resources_and_timings(
+    Path("results/JSRecon"), gpu=True
+)
+plot_e7_frame(*timing_and_resource_info, FRAME_NR, Path("./results/plots"), gpu=True)
+
+timing_and_resource_info = load_e7_resources_and_timings(
+    Path("results/JSRecon"), gpu=False
+)
+plot_e7_frame(*timing_and_resource_info, FRAME_NR, Path("./results/plots"), gpu=False)
