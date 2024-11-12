@@ -237,3 +237,45 @@ def parse_e7_resource_file(resources_path: Path) -> pd.DataFrame:
             gpu_memory=lambda df: df.gpu_memory / 1000,
         )
     )
+
+
+def load_e7_resources_and_timings(path: Path, *, gpu: bool):
+    """Identify relevant files in the directories and load data from them.
+
+    :param path: Directory with 'No-GPU' and 'GPU' directories
+    :param gpu: Inidicator which of the two options should be used
+    """
+    base_path = path / "GPU" if gpu else "No-GPU"
+    recon_logfiles = [
+        file
+        for file in os.listdir(base_path)
+        if file.startswith("log_e7_recon") and not "transformed" in file
+    ]
+    histo_logfiles = [
+        file
+        for file in os.listdir(base_path)
+        if file.startswith("log_HistogramReplay") and not "transformed" in file
+    ]
+
+    assert len(recon_logfiles) == 1
+    assert len(histo_logfiles) == 1
+
+    histo_resources_path = base_path / "resources_HistogramReplay_sino_frames.csv"
+    recon_resources_path = base_path / "resources_e7_recon_recon.csv"
+
+    histo_logpath = base_path / histo_logfiles.pop()
+    recon_logpath = base_path / recon_logfiles.pop()
+
+    transf_histo_logpath = Path(f"{str(histo_logpath)[:-4]}_transformed.txt")
+    transf_recon_logpath = Path(f"{str(recon_logpath)[:-4]}_transformed.txt")
+
+    fix_e7_log_column_lengths(recon_logpath, transf_recon_logpath)
+    fix_e7_log_column_lengths(histo_logpath, transf_histo_logpath)
+
+    histo_timings = load_e7_histo_timings(transf_histo_logpath)
+    recon_timings = load_e7_recon_timings(transf_recon_logpath)
+
+    histo_resource_data = parse_e7_resource_file(histo_resources_path)
+    recon_resource_data = parse_e7_resource_file(recon_resources_path)
+
+    return histo_resource_data, histo_timings, recon_resource_data, recon_timings
