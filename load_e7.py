@@ -48,6 +48,10 @@ recon_frame_data.index = recon_frame_data.index + histo_frame_timings.max()
 frame_data = pd.concat((histo_frame_data, recon_frame_data))
 frame_timings = pd.concat((histo_frame_timings, recon_frame_timings))
 
-plot_disk(frame_data, frame_timings, "disk.png")
-plot_gpu(frame_data, frame_timings, "gpu.png")
-plot_cpu_ram(frame_data, frame_timings, "cpu_ram.png")
+vert_line_pos = (
+    histo_frame_timings[("histograming", "end")] + recon_frame_data.index.min()
+) / 2
+
+plot_disk(frame_data, frame_timings, "disk.png", vert_line_pos)
+plot_gpu(frame_data, frame_timings, "gpu.png", vert_line_pos)
+plot_cpu_ram(frame_data, frame_timings, "cpu_ram.png", vert_line_pos)

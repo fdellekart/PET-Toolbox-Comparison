@@ -12,6 +12,7 @@ def plot_cpu_ram(
     resource_data: pd.DataFrame,
     frame_timings: pd.Series,
     target_file: Optional[Path] = None,
+    vertical_line_pos: Optional[int] = None,
 ) -> None:
     fig, (cpu_ax, mem_ax) = plt.subplots(2, 1, figsize=(7, 5), dpi=300, sharex=True)
 
@@ -24,6 +25,10 @@ def plot_cpu_ram(
 
     cpu_ax.plot(resource_data.index, resource_data["n_cpus"])
     mem_ax.plot(resource_data.index, resource_data["memory"])
+
+    if vertical_line_pos is not None:
+        cpu_ax.axvline(vertical_line_pos, linestyle="--", color="black", linewidth=1)
+        mem_ax.axvline(vertical_line_pos, linestyle="--", color="black", linewidth=1)
 
     cpu_ax.xaxis.set_major_formatter(MyFormatter())
 
@@ -57,6 +62,7 @@ def plot_gpu(
     resource_data: pd.DataFrame,
     frame_timings: pd.Series,
     target_file: Optional[Path] = None,
+    vertical_line_pos: Optional[int] = None,
 ) -> None:
     fig, (gpu_util_ax, gpu_mem_ax) = plt.subplots(
         2, 1, figsize=(7, 5), dpi=300, sharex=True
@@ -68,6 +74,14 @@ def plot_gpu(
 
     gpu_util_ax.plot(resource_data.index, resource_data["gpu_util"])
     gpu_mem_ax.plot(resource_data.index, resource_data["gpu_memory"])
+
+    if vertical_line_pos is not None:
+        gpu_util_ax.axvline(
+            vertical_line_pos, linestyle="--", color="black", linewidth=1
+        )
+        gpu_mem_ax.axvline(
+            vertical_line_pos, linestyle="--", color="black", linewidth=1
+        )
 
     gpu_mem_ax.xaxis.set_major_formatter(MyFormatter())
 
@@ -100,6 +114,7 @@ def plot_disk(
     resource_data: pd.DataFrame,
     frame_timings: pd.Series,
     target_file: Optional[Path] = None,
+    vertical_line_pos: Optional[int] = None,
 ) -> None:
     fig, (read_ax, write_ax) = plt.subplots(2, 1, figsize=(7, 5), dpi=300, sharex=True)
 
@@ -111,6 +126,10 @@ def plot_disk(
 
     read_ax.plot(resource_data.index, resource_data["disk_read"])
     write_ax.plot(resource_data.index, resource_data["disk_written"])
+
+    if vertical_line_pos is not None:
+        read_ax.axvline(vertical_line_pos, linestyle="--", color="black", linewidth=1)
+        write_ax.axvline(vertical_line_pos, linestyle="--", color="black", linewidth=1)
 
     read_ax.xaxis.set_major_formatter(MyFormatter())
 
