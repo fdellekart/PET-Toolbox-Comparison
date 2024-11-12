@@ -138,38 +138,47 @@ def fix_e7_log_column_lengths(
                 f.write(new_line)
 
 
-def load_e7_frame_timings(fixed_col_length_file: Path) -> pd.DataFrame:
+def load_e7_fixed_col_length_file(path: Path) -> pd.DataFrame:
+    """Load the transformed file and perform preprocessing.
+
+    :param path: Preprocessed file with a constant column length
+    :return: dataframe with time index and colums msg_type, msg
+    """
+    with open(path, "r") as f:
+        max_msg_col_length = len(f.readline())
+
+    return (
+        pd.read_fwf(path, colspecs=[(0, 1), (2, 25), (38, max_msg_col_length)])
+        .set_axis(["msg_type", "time", "msg"], axis=1)
+        .astype({"time": "datetime64[ns]"})
+        .set_index("time")
+        .assign(msg=lambda df: df.msg.str.strip())
+    )
+
+
+def load_e7_recon_timings(fixed_col_length_file: Path) -> pd.DataFrame:
     """Parse e7 tools log file into common dataframe
     with duration information of frames
 
     :param fixed_col_length_file: Preprocessed file with a constant colum length
     :return: Dataframe with frame timings
     """
-    with open(fixed_col_length_file, "r") as f:
-        max_msg_col_length = len(f.readline())
+    data = load_e7_fixed_col_length_file(fixed_col_length_file)
+    msg = data["msg"]
 
-    data = pd.read_fwf(
-        fixed_col_length_file, colspecs=[(0, 1), (2, 25), (38, max_msg_col_length)]
-    )
-    data.columns = ["msg_type", "time", "msg"]
-    data["time"] = pd.to_datetime(data["time"])
-    data.set_index("time", inplace=True)
-    data["msg"] = data["msg"].str.strip()
-    cond_start = data["msg"].str.startswith("axis table=4084").fillna(False)
-    cond_end = data["msg"].str.startswith("finished calculation of image").fillna(False)
+    cond_start = msg.str.startswith("axis table=4084").fillna(False)
+    cond_end = msg.str.startswith("finished calculation of image").fillna(False)
 
     frame_starts = data[cond_start].index
     frame_ends = data[cond_end].index
 
-    cond_start = data["msg"].str.contains("estimate scatter sinogram").fillna(False)
-    cond_end = (
-        data["msg"].str.contains("End Scatter Simulation Iteration 2").fillna(False)
-    )
+    cond_start = msg.str.contains("estimate scatter sinogram").fillna(False)
+    cond_end = msg.str.contains("End Scatter Simulation Iteration 2").fillna(False)
     scatter_starts = data[cond_start].index
     scatter_ends = data[cond_end].index
 
-    cond_start = data["msg"].str.contains("start calculation of image").fillna(False)
-    cond_end = data["msg"].str.contains("finished calculation of image").fillna(False)
+    cond_start = msg.str.contains("start calculation of image").fillna(False)
+    cond_end = msg.str.contains("finished calculation of image").fillna(False)
     recon_starts = data[cond_start].index
     recon_ends = data[cond_end].index
 
