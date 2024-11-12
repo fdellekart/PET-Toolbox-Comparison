@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from plotting.utils import add_blocks_to_ax, MyFormatter
+from plotting.loading import prepare_for_single_frame_plot
 
 
 def plot_cpu_ram(
@@ -156,3 +157,54 @@ def plot_disk(
     else:
         plt.savefig(target_file)
     plt.close()
+
+
+def plot_e7_frame(
+    histo_resource_data: pd.DataFrame,
+    histo_timings: pd.DataFrame,
+    recon_resource_data: pd.DataFrame,
+    recon_timings: pd.DataFrame,
+    frame_nr: int,
+    target_dir: Path,
+    gpu: bool,
+):
+    """Plot all plots for the single frame and save them to target dir."""
+    recon_frame_data, recon_frame_timings = prepare_for_single_frame_plot(
+        recon_resource_data, recon_timings, frame_nr
+    )
+    histo_frame_data, histo_frame_timings = prepare_for_single_frame_plot(
+        histo_resource_data, histo_timings, frame_nr
+    )
+
+    histo_frame_timings.index = pd.MultiIndex.from_product(
+        (("histograming",), ("start", "end"))
+    )
+    recon_frame_timings = recon_frame_timings + histo_frame_timings.max()
+    recon_frame_data.index = recon_frame_data.index + histo_frame_timings.max()
+
+    frame_data = pd.concat((histo_frame_data, recon_frame_data))
+    frame_timings = pd.concat((histo_frame_timings, recon_frame_timings))
+
+    vert_line_pos = (
+        histo_frame_timings[("histograming", "end")] + recon_frame_data.index.min()
+    ) / 2
+
+    plot_disk(
+        frame_data,
+        frame_timings,
+        target_dir / f"e7-tools_disk_frame{frame_nr}.png",
+        vert_line_pos,
+    )
+    plot_cpu_ram(
+        frame_data,
+        frame_timings,
+        target_dir / f"e7-tools_cpu_ram_frame{frame_nr}.png",
+        vert_line_pos,
+    )
+    if gpu:
+        plot_gpu(
+            frame_data,
+            frame_timings,
+            target_dir / f"e7-tools_gpu_frame{frame_nr}.png",
+            vert_line_pos,
+        )
