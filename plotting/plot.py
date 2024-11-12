@@ -106,6 +106,7 @@ def plot_disk(
     read_ax.set_title("Data read from disk")
     write_ax.set_title("Data written to disk")
     read_ax.set_ylabel("MB/s")
+    write_ax.set_ylabel("MB/s")
     write_ax.set_xlabel("Time [min]")
 
     read_ax.plot(resource_data.index, resource_data["disk_read"])
