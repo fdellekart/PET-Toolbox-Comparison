@@ -194,6 +194,30 @@ def load_e7_recon_timings(fixed_col_length_file: Path) -> pd.DataFrame:
     )
 
 
+def load_e7_histo_timings(fixed_col_length_file: Path) -> pd.DataFrame:
+    """Load timings for histogramming form log.
+    The data is returned in the dataframe as 'frame' as the first
+    level of the multiindex to be compatible with 'prepare_for_single_frame_plot'.
+
+    :param fixed_col_length_file: Preprocessed file with a constant colum length
+    """
+    data = load_e7_fixed_col_length_file(fixed_col_length_file)
+    msg = data["msg"]
+
+    cond_start = msg.str.contains("Sinogram no =")
+    cond_end = msg.str.contains("Frame_write: Just sent Frame")
+
+    histo_starts = data.index[600:][cond_start[600:]][::2]
+    histo_ends = data[cond_end].index[1:]
+
+    return pd.DataFrame(
+        data={
+            ("frame", "start"): histo_starts,
+            ("frame", "end"): histo_ends,
+        }
+    )
+
+
 def parse_e7_resource_file(resources_path: Path) -> pd.DataFrame:
     """Load the resource log created by the powershell script
     running in parallel to the e7-tools reconstruction. The format
