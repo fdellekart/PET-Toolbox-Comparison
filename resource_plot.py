@@ -13,13 +13,16 @@ RUNDIR = Path("results")
 TOOLBOXES = {"SIRF-STIR", "NiftyPET"}
 TOOLBOX_SUPPORTS_GPU = {"SIRF-STIR": False, "NiftyPET": True}
 
-for frame_idx in tqdm(range(106)):
+timing_and_resources = {
+    toolbox: load_resources_and_timings(RUNDIR / toolbox) for toolbox in TOOLBOXES
+}
+
+for frame_idx in tqdm(range(106), "Processing generic toolbox frames"):
     for toolbox in TOOLBOXES:
         # NiftyPET only starts at frame 10 because it fails on lack of events before
         if toolbox == "NiftyPET" and frame_idx < 10:
             continue
 
-        timing_and_resources = load_resources_and_timings(RUNDIR / toolbox)
         frame_timing_and_resource = prepare_for_single_frame_plot(
             *timing_and_resources[toolbox],
             frame_idx - 10 if toolbox == "NiftyPET" else frame_idx,
@@ -31,16 +34,20 @@ for frame_idx in tqdm(range(106)):
             gpu=TOOLBOX_SUPPORTS_GPU[toolbox],
         )
 
-    timing_and_resources = load_e7_resources_and_timings(
-        Path("results/JSRecon"), gpu=True
-    )
-    plot_e7_frame(
-        *timing_and_resources, frame_idx, Path("./results/plots/e7-tools"), gpu=True
-    )
+timing_and_resources_gpu = load_e7_resources_and_timings(
+    Path("results/JSRecon"), gpu=True
+)
+timing_and_resources_nogpu = load_e7_resources_and_timings(
+    Path("results/JSRecon"), gpu=False
+)
 
-    timing_and_resources = load_e7_resources_and_timings(
-        Path("results/JSRecon"), gpu=False
+for frame_idx in tqdm(range(106), "Processing e7 frames"):
+    plot_e7_frame(
+        *timing_and_resources_gpu, frame_idx, Path("./results/plots/e7-tools"), gpu=True
     )
     plot_e7_frame(
-        *timing_and_resources, frame_idx, Path("./results/plots/e7-tools"), gpu=False
+        *timing_and_resources_nogpu,
+        frame_idx,
+        Path("./results/plots/e7-tools"),
+        gpu=False,
     )
