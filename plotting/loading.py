@@ -245,7 +245,7 @@ def load_e7_resources_and_timings(path: Path, *, gpu: bool):
     :param path: Directory with 'No-GPU' and 'GPU' directories
     :param gpu: Inidicator which of the two options should be used
     """
-    base_path = path / "GPU" if gpu else "No-GPU"
+    base_path = path / "GPU" if gpu else path / "No-GPU"
     recon_logfiles = [
         file
         for file in os.listdir(base_path)
