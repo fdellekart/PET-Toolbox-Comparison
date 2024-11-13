@@ -4,6 +4,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import Formatter
 
+colors = {
+    "histograming": "skyblue",
+    "randoms": "darkgreen",
+    "scatter": "tan",
+    "recon": "darkorange",
+}
 
 get_blocklable = lambda block_name: re.match(
     r"^([a-zA-Z]+)(?:_itr\d+)?$", block_name
@@ -28,9 +34,9 @@ def add_blocks_to_ax(ax: plt.Axes, frame_timings: pd.Series):
         Blocks of the format '<block_name>_itr<n>' are labeled and colored
         only once with `block_name`.
     """
-    cmap = plt.get_cmap("tab20")
     block_names = frame_timings.index.levels[0].drop("frame")
-    block_labels = list({get_blocklable(block_name) for block_name in block_names})
+    block_labels = [get_blocklable(block_name) for block_name in block_names]
+    block_labels.sort()
     existing_labels = set()
 
     for block_name in block_names:
@@ -45,6 +51,6 @@ def add_blocks_to_ax(ax: plt.Axes, frame_timings: pd.Series):
             frame_timings[block_name]["end"],
             alpha=0.3,
             label=(block_label if block_label not in existing_labels else None),
-            color=cmap(block_labels.index(get_blocklable(block_name))),
+            color=colors[block_label],
         )
         existing_labels.add(block_label)
