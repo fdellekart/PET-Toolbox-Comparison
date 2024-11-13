@@ -1,14 +1,35 @@
 """Utilities to load metadata and timing information"""
 
 import os
+import json
 from pathlib import Path
 from typing import Tuple
 
 import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 E7_LOG_START_OF_MSG_COL_IDX = 39
+
+
+def load_resources_and_timings(path: Path) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Load resources csv and metdata json into dataframes
+
+    :param path: Path to a dir with 'resources.csv' and 'metadata.json'
+    :return: timeseries of the resource data and dataframe of metadata
+             with one row for each frame
+    """
+    resource_file = path / "resources.csv"
+    metadata_file = path / "metadata.json"
+
+    with open(metadata_file) as f:
+        metadata = json.load(f)
+
+    timings = parse_timings(metadata)
+    resource_data = parse_resources_file(resource_file)
+
+    return resource_data, timings
 
 
 def parse_resources_file(datafile: str) -> pd.DataFrame:

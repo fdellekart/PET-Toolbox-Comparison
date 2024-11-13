@@ -9,6 +9,20 @@ from plotting.utils import add_blocks_to_ax, MyFormatter
 from plotting.loading import prepare_for_single_frame_plot
 
 
+def plot_frame(
+    resources: pd.DataFrame,
+    timings: pd.Series,
+    frame_nr: int,
+    target_dir: Path,
+    gpu: bool,
+):
+    """Plot disk, cpu&ram and, if gpu==True, gpu."""
+    plot_disk(resources, timings, target_dir / f"disk_frame{frame_nr}.png")
+    plot_cpu_ram(resources, timings, target_dir / f"cpu&ram_frame{frame_nr}.png")
+    if gpu:
+        plot_gpu(resources, timings, target_dir / f"gpu_frame{frame_nr}.png")
+
+
 def plot_cpu_ram(
     resource_data: pd.DataFrame,
     frame_timings: pd.Series,
