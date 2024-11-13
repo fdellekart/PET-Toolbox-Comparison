@@ -2,6 +2,9 @@
 
 import os
 import json
+import warnings
+
+warnings.filterwarnings("ignore")
 from pathlib import Path
 from typing import Tuple
 

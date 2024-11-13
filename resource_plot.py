@@ -15,9 +15,14 @@ TOOLBOX_SUPPORTS_GPU = {"SIRF-STIR": False, "NiftyPET": True}
 
 for frame_idx in tqdm(range(106)):
     for toolbox in TOOLBOXES:
+        # NiftyPET only starts at frame 10 because it fails on lack of events before
+        if toolbox == "NiftyPET" and frame_idx < 10:
+            continue
+
         timing_and_resources = load_resources_and_timings(RUNDIR / toolbox)
         frame_timing_and_resource = prepare_for_single_frame_plot(
-            *timing_and_resources, frame_idx
+            *timing_and_resources[toolbox],
+            frame_idx - 10 if toolbox == "NiftyPET" else frame_idx,
         )
         plot_frame(
             *frame_timing_and_resource,
