@@ -174,7 +174,7 @@ def load_e7_fixed_col_length_file(path: Path) -> pd.DataFrame:
     return (
         pd.read_fwf(path, colspecs=[(0, 1), (2, 25), (38, max_msg_col_length)])
         .set_axis(["msg_type", "time", "msg"], axis=1)
-        .astype({"time": "datetime64[ns]"})
+        .assign(time=lambda df: pd.to_datetime(df["time"]))
         .set_index("time")
         .assign(msg=lambda df: df.msg.str.strip())
     )
