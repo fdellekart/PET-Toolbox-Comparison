@@ -263,7 +263,7 @@ def parse_e7_resource_file(resources_path: Path) -> pd.DataFrame:
     )
 
 
-def load_e7_resources_and_timings(path: Path, *, gpu: bool):
+def load_e7_resources_and_timings(path: Path, *, gpu: bool) -> Tuple[pd.DataFrame, ...]:
     """Identify relevant files in the directories and load data from them.
 
     :param path: Directory with 'No-GPU' and 'GPU' directories
