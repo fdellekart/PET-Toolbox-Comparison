@@ -8,26 +8,26 @@ from plotting.loading import load_resources_and_timings
 
 resources, timings = load_resources_and_timings(Path("results/SIRF-STIR"))
 
-# mask = ((
-#     resources.index.values[:, None] >= timings[("recon_itr0", "start")].values
-# ) & (resources.index.values[:, None] <= timings[("recon_itr6", "end")].values))
+mask = (resources.index.values[:, None] >= timings[("frame", "start")].values) & (
+    resources.index.values[:, None] <= timings[("frame", "end")].values
+)
 
-# ram = resources.loc[mask.any(axis=1), ["memory"]]
-# mask = mask[mask.any(axis=1)]
-# ram["frame_nr"] = mask.argmax(axis=1)
+ram = resources.loc[mask.any(axis=1), ["memory"]]
+mask = mask[mask.any(axis=1)]
+ram["frame_nr"] = mask.argmax(axis=1)
 
-# mean_ram = ram.groupby("frame_nr").mean()
+mean_ram = ram.groupby("frame_nr").mean()
+mean_ram = mean_ram.loc[1:, :]
 
-# rate, intercept = np.polyfit(mean_ram.index.values, mean_ram["memory"], 1)
+rate, intercept = np.polyfit(mean_ram.index.values, mean_ram["memory"], 1)
 
-# keys = []
-# for itr in range(5):
-#     key = f"duration{itr}"
-#     keys.append(key)
-#     timings[key] = timings[(f"scatter_itr{itr}", "end")] - timings[(f"scatter_itr{itr}", "start")]
+plt.plot(mean_ram.index, mean_ram["memory"])
+plt.show()
 
 histograming = timings[("histograming", "end")] - timings[("histograming", "start")]
 randoms = timings[("randoms", "end")] - timings[("randoms", "start")]
+scatter = timings[("scatter", "end")] - timings[("scatter", "start")]
+recon = timings[("recon", "end")] - timings[("recon", "start")]
 
 plt.figure(figsize=(7, 5), dpi=300)
 plt.plot(histograming.index, histograming.dt.seconds, label="histograming")
