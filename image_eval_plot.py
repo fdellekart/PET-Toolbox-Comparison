@@ -7,13 +7,11 @@ import matplotlib.pyplot as plt
 
 plt.rcParams.update({"font.size": 15})
 
-TOOLBOXES = ["NiftyPET", "SIRF-STIR"]
+TOOLBOXES = ["NiftyPET"]
 datafiles = {toolbox: f"results/{toolbox}/evaluation.json" for toolbox in TOOLBOXES}
 datafiles["e7-tools"] = "results/JSRecon/No-GPU/evaluation.json"
-datafiles["SIRF"] = datafiles["SIRF-STIR"]
-datafiles.pop("SIRF-STIR")
 
-ORDER = ["e7-tools", "NiftyPET", "SIRF"]
+ORDER = ["e7-tools", "NiftyPET"]
 
 
 data = []
@@ -51,10 +49,6 @@ for toolbox in ORDER:
     frame_nr = np.arange(len(snr_means))
     if toolbox == "NiftyPET":
         frame_nr += 10
-
-    if toolbox != "SIRF":
-        ax_cnr.plot(frame_nr, cnr_means, label=toolbox)
-        ax_cnr.fill_between(frame_nr, cnr_lower_bound, cnr_upper_bound, alpha=0.2)
 
     ax_snr.plot(frame_nr, snr_means, label=toolbox)
     ax_snr.fill_between(frame_nr, snr_lower_bound, snr_upper_bound, alpha=0.2)
