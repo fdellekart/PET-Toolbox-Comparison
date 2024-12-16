@@ -35,8 +35,6 @@ def add_blocks_to_ax(ax: plt.Axes, frame_timings: pd.Series):
         only once with `block_name`.
     """
     block_names = frame_timings.index.levels[0].drop("frame")
-    block_labels = [get_blocklable(block_name) for block_name in block_names]
-    block_labels.sort()
     existing_labels = set()
 
     for block_name in block_names:

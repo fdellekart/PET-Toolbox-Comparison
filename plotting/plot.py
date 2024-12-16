@@ -4,6 +4,7 @@ from typing import Optional
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mplpatch
 
 from plotting.utils import add_blocks_to_ax, MyFormatter
 from plotting.loading import prepare_for_single_frame_plot
@@ -68,7 +69,11 @@ def plot_cpu_ram(
         handles[-2], handles[-1] = handles[-1], handles[-2]
         labels[-2], labels[-1] = labels[-1], labels[-2]
 
-    fig.legend(handles, labels, ncols=4, loc="lower center", frameon=False)
+    patch = mplpatch.Patch(facecolor="white", edgecolor="darkgray", label="unassigned")
+    handles.append(patch)
+    labels.append("unassigned")
+
+    fig.legend(handles, labels, ncols=5, loc="lower center", frameon=False)
 
     plt.tight_layout(rect=[0, 0.05, 1, 1])
 
@@ -126,7 +131,11 @@ def plot_gpu(
         handles[-2], handles[-1] = handles[-1], handles[-2]
         labels[-2], labels[-1] = labels[-1], labels[-2]
 
-    fig.legend(handles, labels, ncols=4, loc="lower center", frameon=False)
+    patch = mplpatch.Patch(facecolor="white", edgecolor="darkgray", label="unassigned")
+    handles.append(patch)
+    labels.append("unassigned")
+
+    fig.legend(handles, labels, ncols=5, loc="lower center", frameon=False)
 
     plt.tight_layout(rect=[0, 0.05, 1, 1])
 
@@ -180,7 +189,11 @@ def plot_disk(
         handles[-2], handles[-1] = handles[-1], handles[-2]
         labels[-2], labels[-1] = labels[-1], labels[-2]
 
-    fig.legend(handles, labels, ncols=4, loc="lower center", frameon=False)
+    patch = mplpatch.Patch(facecolor="white", edgecolor="darkgray", label="unassigned")
+    handles.append(patch)
+    labels.append("unassigned")
+
+    fig.legend(handles, labels, ncols=5, loc="lower center", frameon=False)
 
     plt.tight_layout(rect=[0, 0.05, 1, 1])
 
