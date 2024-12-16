@@ -29,11 +29,17 @@ def plot_cpu_ram(
     target_file: Optional[Path] = None,
     vertical_line_pos: Optional[int] = None,
 ) -> None:
+    fig: plt.Figure
+    cpu_ax: plt.Axes
+    mem_ax: plt.Axes
+
     fig, (cpu_ax, mem_ax) = plt.subplots(2, 1, figsize=(7, 5), dpi=300, sharex=True)
 
     cpu_ax.set_ylabel("CPU utilization [$n_{cores}$]")
     mem_ax.set_ylabel("Memory usage [GB]")
     mem_ax.set_xlabel("Time [min]")
+    cpu_ax.set_xlim(0, resource_data.index.max())
+    mem_ax.set_xlim(0, resource_data.index.max())
 
     if resource_data["n_cpus"].max() < 1.05:
         cpu_ax.set_ylim(0, 1.05)
@@ -79,6 +85,10 @@ def plot_gpu(
     target_file: Optional[Path] = None,
     vertical_line_pos: Optional[int] = None,
 ) -> None:
+    fig: plt.Figure
+    gpu_util_ax: plt.Axes
+    gpu_mem_ax: plt.Axes
+
     fig, (gpu_util_ax, gpu_mem_ax) = plt.subplots(
         2, 1, figsize=(7, 5), dpi=300, sharex=True
     )
@@ -86,6 +96,8 @@ def plot_gpu(
     gpu_util_ax.set_ylabel("GPU utilization [%]")
     gpu_mem_ax.set_ylabel("GPU memory usage [GB]")
     gpu_mem_ax.set_xlabel("Time [min]")
+    gpu_util_ax.set_xlim(0, resource_data.index.max())
+    gpu_mem_ax.set_xlim(0, resource_data.index.max())
 
     gpu_util_ax.plot(resource_data.index, resource_data["gpu_util"])
     gpu_mem_ax.plot(resource_data.index, resource_data["gpu_memory"])
@@ -131,6 +143,10 @@ def plot_disk(
     target_file: Optional[Path] = None,
     vertical_line_pos: Optional[int] = None,
 ) -> None:
+    fig: plt.Figure
+    read_ax: plt.Axes
+    write_ax: plt.Axes
+
     fig, (read_ax, write_ax) = plt.subplots(2, 1, figsize=(7, 5), dpi=300, sharex=True)
 
     read_ax.set_title("Data read from disk")
@@ -138,6 +154,8 @@ def plot_disk(
     read_ax.set_ylabel("MB/s")
     write_ax.set_ylabel("MB/s")
     write_ax.set_xlabel("Time [min]")
+    read_ax.set_xlim(0, resource_data.index.max())
+    write_ax.set_xlim(0, resource_data.index.max())
 
     read_ax.plot(resource_data.index, resource_data["disk_read"])
     write_ax.plot(resource_data.index, resource_data["disk_written"])
