@@ -2,9 +2,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
-from plotting.loading import load_resources_and_timings
+from .loading import load_resources_and_timings
 
 resources, timings = load_resources_and_timings(Path("results/SIRF-STIR"))
 

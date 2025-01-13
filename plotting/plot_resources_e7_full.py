@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from plotting.loading import load_e7_resources_and_timings
+from .loading import load_e7_resources_and_timings
 
 histo_resources, _, recon_resources, _ = load_e7_resources_and_timings(
     Path("./results/JSRecon-HighPower"), gpu=True

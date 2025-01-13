@@ -3,7 +3,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-from plotting.loading import load_e7_resources_and_timings
+from .loading import load_e7_resources_and_timings
 
 histo_resources, histo_timings, recon_resources, recon_timings = (
     load_e7_resources_and_timings(Path("results/JSRecon"), gpu=True)
