@@ -16,4 +16,4 @@ please refer to the README file in the directory.
 The `plotting` directory contains various scripts and utilities for plotting
 the results.
 
-The full thesis is available at TODO.
+The full thesis is available [here](https://doi.org/10.34726/hss.2025.123400).
