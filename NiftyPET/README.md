@@ -8,7 +8,7 @@ To run the reconstruction pipeline, clone this repository and create directories
 The reconstruction is running inside a docker container.
 
 The following files/directories must be present inside the input directory:
-- mumap (Directory with MRAC mumaps)
+- mumap (Directory with pseudoCT mumaps)
 - hmumap.npz
 - listmode `.dcm` and `.bf` files
 - norm `.dcm` and `.bf` files
@@ -16,6 +16,9 @@ The following files/directories must be present inside the input directory:
 
 When all this files are present you can start the pipeline by running `./run_recon.sh`.
 To adapt the timeframe settings to reconstruct edit the variables on top of `run_recon.sh`.
+
+The reconstruction runs on a [fork of NiftyPET](https://github.com/fdellekart/NIPET/tree/measure-timing),
+which instruments the toolbox to extract timing information.
 
 Results are written to the `output` directory and consist of a `result.nii.gz` file and
 as `metadata.json` with timing information and reconstruction settings.
